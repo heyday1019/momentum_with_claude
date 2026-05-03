@@ -19,6 +19,16 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        buyCta:
+          "bg-fortune-primary text-fortune-canvas hover:bg-fortune-primary-deep active:bg-fortune-primary-deep disabled:bg-fortune-stone disabled:text-fortune-canvas",
+        kakao:
+          "bg-fortune-kakao text-fortune-kakao-ink hover:brightness-95 active:brightness-90",
+        google:
+          "bg-fortune-surface-soft text-fortune-ink-deep hover:bg-fortune-hairline-soft active:bg-fortune-hairline",
+        ghostInk:
+          "bg-fortune-canvas text-fortune-ink-deep border-2 border-fortune-ink-deep hover:bg-fortune-surface-soft",
+        criticalGhost:
+          "bg-fortune-canvas text-fortune-critical border border-fortune-hairline hover:bg-fortune-surface-soft",
       },
       size: {
         default:
@@ -32,6 +42,8 @@ const buttonVariants = cva(
         "icon-sm":
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
+        pill: "h-[54px] px-[30px] rounded-full text-sm font-bold",
+        pillSm: "h-[44px] px-[22px] rounded-full text-sm font-bold",
       },
     },
     defaultVariants: {
