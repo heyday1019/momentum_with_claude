@@ -111,3 +111,52 @@ export async function getZodiacFortune(viewer?: ViewerProfile): Promise<ZodiacCo
 
   return safe
 }
+
+export async function getLottoRec(viewer?: ViewerProfile): Promise<LottoResult> {
+  const { supabase, user, profile } = await requireProfile()
+  const target: ProfileInput = viewer ?? { name: profile.name, birthdate: profile.birthdate, gender: profile.gender }
+  const today = todayKst()
+  const drawNumber = nextLottoDrawNumber()
+
+  if (!viewer) {
+    const { data: cached } = await supabase
+      .from('lotto_recommendations')
+      .select('numbers, comment, draw_number')
+      .eq('user_id', user.id)
+      .eq('draw_number', drawNumber)
+      .maybeSingle()
+    if (cached) return {
+      draw_number: cached.draw_number,
+      numbers: cached.numbers as number[],
+      comment: cached.comment,
+    }
+  }
+
+  // viewer 모드면 anonymous seed로
+  const seedKey = viewer ? `viewer:${target.name}:${target.birthdate}:${target.gender}` : user.id
+  const numbers = generateLottoNumbers(seedKey, drawNumber)
+
+  const { comment } = await callFortuneModel<{ comment: string }>({
+    systemPrompt: SYSTEM_PROMPT,
+    userPrompt: buildLottoCommentPrompt({
+      name: target.name,
+      drawNumber,
+      numbers,
+      today,
+    }),
+    expectJson: true,
+    maxTokens: 200,
+    temperature: 0.5,
+  })
+
+  if (!viewer) {
+    await supabase.from('lotto_recommendations').insert({
+      user_id: user.id,
+      draw_number: drawNumber,
+      numbers,
+      comment,
+    })
+  }
+
+  return { draw_number: drawNumber, numbers, comment }
+}
