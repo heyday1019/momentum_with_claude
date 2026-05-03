@@ -4,7 +4,7 @@ import { updateSession } from '@/lib/supabase/middleware'
 const PUBLIC_PATHS = ['/login', '/login/email', '/auth/callback']
 const ONBOARDING_PATH = '/onboarding'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { response, supabase, user } = await updateSession(request)
   const pathname = request.nextUrl.pathname
 
