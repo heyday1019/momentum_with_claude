@@ -11,6 +11,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" className="h-full antialiased">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
       <body
         className="min-h-full flex flex-col bg-fortune-canvas text-fortune-ink-deep"
         style={{ fontFamily: "var(--font-fortune)" }}
