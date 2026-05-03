@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -46,6 +47,35 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Fortune service tokens — DESIGN.md 매핑 */
+  --color-fortune-canvas: #FFFFFF;
+  --color-fortune-ink-deep: #0A1317;
+  --color-fortune-ink: #1F2C32;
+  --color-fortune-charcoal: #3F4B52;
+  --color-fortune-slate: #5C6770;
+  --color-fortune-steel: #7A858C;
+  --color-fortune-stone: #A4ABAF;
+  --color-fortune-hairline: #CBD0D2;
+  --color-fortune-hairline-soft: #E5E8E9;
+  --color-fortune-surface-soft: #F5F6F7;
+  --color-fortune-primary: #0064E0;
+  --color-fortune-primary-deep: #0143B5;
+  --color-fortune-primary-soft: #E6F0FA;
+  --color-fortune-fb-blue: #1877F2;
+  --color-fortune-ink-button: #0A1317;
+  --color-fortune-warning: #FFD24A;
+  --color-fortune-attention: #FF8400;
+  --color-fortune-success: #1F9E5C;
+  --color-fortune-critical: #E5453B;
+  --color-fortune-critical-strong: #C9281C;
+  --color-fortune-kakao: #FEE500;
+  --color-fortune-kakao-ink: #3C1E1E;
+
+  /* Fortune typography */
+  --font-fortune: "Pretendard Variable", "Inter", "Helvetica", "Arial", "Noto Sans KR", sans-serif;
+  --radius-fortune-pill: 9999px;
+  --radius-fortune-card: 32px;
 }
 
 :root {
