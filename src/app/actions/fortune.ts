@@ -64,3 +64,50 @@ export async function getDailyFortune(viewer?: ViewerProfile): Promise<DailyCont
 
   return result
 }
+
+export async function getZodiacFortune(viewer?: ViewerProfile): Promise<ZodiacContent> {
+  const { supabase, user, profile } = await requireProfile()
+  const target: ProfileInput = viewer ?? { name: profile.name, birthdate: profile.birthdate, gender: profile.gender }
+  const today = todayKst()
+
+  if (!viewer) {
+    const { data: cached } = await supabase
+      .from('fortune_daily')
+      .select('content')
+      .eq('user_id', user.id)
+      .eq('date', today)
+      .eq('fortune_type', 'zodiac')
+      .maybeSingle()
+    if (cached) return cached.content as unknown as ZodiacContent
+  }
+
+  const animal = zodiacAnimal(target.birthdate)
+  const sign = zodiacSign(target.birthdate)
+
+  const result = await callFortuneModel<ZodiacContent>({
+    systemPrompt: SYSTEM_PROMPT,
+    userPrompt: buildZodiacPrompt({
+      birthdate: target.birthdate,
+      today,
+      zodiacAnimal: animal,
+      zodiacSign: sign,
+    }),
+    expectJson: true,
+    maxTokens: 500,
+    temperature: 0.7,
+  })
+
+  // 모델이 다른 동물/별자리를 반환할 수 있으니 서버 계산값으로 덮어쓰기
+  const safe: ZodiacContent = { ...result, zodiac_animal: animal, zodiac_sign: sign }
+
+  if (!viewer) {
+    await supabase.from('fortune_daily').insert({
+      user_id: user.id,
+      date: today,
+      fortune_type: 'zodiac',
+      content: safe as unknown as Json,
+    })
+  }
+
+  return safe
+}
