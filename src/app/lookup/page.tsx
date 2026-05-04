@@ -53,6 +53,13 @@ export default async function LookupPage({ searchParams }: PageProps) {
           </>
         ) : (
           <>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 text-sm font-bold text-fortune-steel w-fit"
+            >
+              <ArrowLeft className="size-4" />
+              홈
+            </Link>
             <div className="flex flex-col gap-1 pb-1">
               <h1 className="text-[28px] font-light leading-tight text-fortune-ink-deep">
                 다른 사람의 운세
