@@ -91,7 +91,7 @@ export function DreamForm() {
       </div>
 
       <p className="text-xs text-fortune-stone leading-relaxed text-center">
-        결과는 저장되지 않아요. 필요하면 결과 화면의 공유 버튼으로 보관해주세요.
+        결과는 자동으로 꿈 일기에 보관돼요. 필요 없으면 일기에서 삭제할 수 있어요.
       </p>
     </div>
   )
@@ -153,7 +153,7 @@ function DreamResult({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xs font-bold text-fortune-stone leading-relaxed text-center">
-        결과는 저장되지 않아요. 필요하면 공유 버튼으로 보관해주세요.
+        ✓ 꿈 일기에 자동 저장됐어요. 일기에서 다시 보거나 삭제할 수 있어요.
       </p>
 
       <div className="rounded-2xl bg-fortune-surface-soft p-4 flex items-center gap-3">

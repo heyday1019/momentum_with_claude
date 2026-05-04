@@ -46,6 +46,53 @@ export type Database = {
           },
         ]
       }
+      dream_journal: {
+        Row: {
+          advice: string
+          created_at: string
+          dream_content: string
+          id: number
+          interpretation: string
+          model: string
+          persona: string
+          summary: string
+          symbols: Json
+          user_id: string
+        }
+        Insert: {
+          advice: string
+          created_at?: string
+          dream_content: string
+          id?: never
+          interpretation: string
+          model: string
+          persona: string
+          summary: string
+          symbols: Json
+          user_id: string
+        }
+        Update: {
+          advice?: string
+          created_at?: string
+          dream_content?: string
+          id?: never
+          interpretation?: string
+          model?: string
+          persona?: string
+          summary?: string
+          symbols?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dream_journal_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fortune_daily: {
         Row: {
           content: Json

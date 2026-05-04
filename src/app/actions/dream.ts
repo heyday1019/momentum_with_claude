@@ -6,6 +6,7 @@ import { todayKst } from '@/lib/fortune/kst'
 import { DREAM_PERSONA_PROMPTS, buildDreamPrompt } from '@/lib/fortune/prompts'
 import { DREAM_PERSONAS, type DreamPersonaKey } from '@/lib/fortune/dream-personas'
 import type { Gender } from '@/lib/fortune/types'
+import type { Json } from '@/lib/supabase/database.types'
 
 export interface DreamSymbol {
   symbol: string
@@ -77,6 +78,20 @@ export async function getDreamInterpretation(input: {
     if (!Array.isArray(result.symbols) || result.symbols.length === 0) {
       return { ok: false, error: '해석 결과 형식이 올바르지 않아요. 다시 시도해주세요.' }
     }
+
+    // 일기에 자동 보관 (조회/삭제는 사용자가 /dream/journal에서)
+    const { error: journalErr } = await supabase.from('dream_journal').insert({
+      user_id: user.id,
+      persona,
+      model: meta.model,
+      dream_content: content,
+      summary: result.summary,
+      interpretation: result.interpretation,
+      symbols: result.symbols as unknown as Json,
+      advice: result.advice,
+    })
+    if (journalErr) console.error('[dream/journal] insert error:', journalErr)
+
     return { ok: true, persona, data: result }
   } catch (e) {
     console.error(`[dream/${persona}] AI call failed:`, e)
