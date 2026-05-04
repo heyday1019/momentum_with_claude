@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { Users, ArrowRight } from 'lucide-react'
+import { Users, ArrowRight, Sparkles } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { CardSkeleton } from '@/components/fortune/card-skeleton'
 import { FortuneCardDaily } from '@/components/fortune/fortune-card-daily'
@@ -31,8 +31,23 @@ export default async function HomePage() {
         <Suspense fallback={<CardSkeleton />}><LottoCard /></Suspense>
 
         <Link
+          href="/tarot"
+          className="rounded-[32px] p-6 flex items-center gap-4 mt-2 text-fortune-canvas"
+          style={{ backgroundImage: 'linear-gradient(135deg, #14161A 0%, #2D3035 100%)' }}
+        >
+          <span className="size-12 rounded-full bg-white/10 inline-flex items-center justify-center shrink-0">
+            <Sparkles className="size-5" />
+          </span>
+          <span className="flex-1 flex flex-col gap-0.5">
+            <span className="text-base font-bold">오늘의 타로 3장</span>
+            <span className="text-sm opacity-70">과거 · 현재 · 미래의 흐름 보기</span>
+          </span>
+          <ArrowRight className="size-5 opacity-70" />
+        </Link>
+
+        <Link
           href="/lookup"
-          className="rounded-[32px] border border-fortune-hairline-soft bg-fortune-surface-soft p-6 flex items-center gap-4 mt-2"
+          className="rounded-[32px] border border-fortune-hairline-soft bg-fortune-surface-soft p-6 flex items-center gap-4"
         >
           <span className="size-12 rounded-full bg-fortune-canvas inline-flex items-center justify-center shrink-0">
             <Users className="size-5 text-fortune-primary-deep" />

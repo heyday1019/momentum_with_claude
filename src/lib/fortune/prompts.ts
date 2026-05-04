@@ -75,3 +75,44 @@ JSON 스키마:
   "comment": "1~2문장 코멘트"
 }`
 }
+
+export interface TarotPromptCard {
+  position: '과거' | '현재' | '미래'
+  name_kr: string
+  name_en: string
+  orientation: '정방향' | '역방향'
+  baseMeaning: string
+}
+
+export function buildTarotPrompt(args: {
+  name: string
+  birthdate: string
+  gender: Gender
+  today: string
+  cards: TarotPromptCard[]
+}): string {
+  const cardLines = args.cards
+    .map(c => `- [${c.position}] ${c.name_kr} (${c.name_en}, ${c.orientation}) — 기본 의미: ${c.baseMeaning}`)
+    .join('\n')
+  return `${args.name}님(생년월일 ${args.birthdate}, ${GENDER_KO[args.gender]})의 ${args.today} 메이저 아르카나 3장 스프레드를 풀이해주세요.
+
+뽑힌 카드:
+${cardLines}
+
+[작성 가이드]
+- 과거 → 현재 → 미래 흐름이 하나의 이야기처럼 이어지도록.
+- 각 카드의 기본 의미를 사용자의 일상 맥락에 연결해 풀이.
+- 역방향은 부정적이라기보다 "주의 신호" 또는 "안으로 향하는 측면"으로 해석.
+- 의학·법률·금융 단정 금지, 위협적인 단어 자제.
+
+JSON 스키마:
+{
+  "headline": "한 줄 요약 (20~40자)",
+  "interpretation": {
+    "past": "과거 카드 풀이 (2~3문장)",
+    "present": "현재 카드 풀이 (2~3문장)",
+    "future": "미래 카드 풀이 (2~3문장)"
+  },
+  "summary": "3장의 흐름을 잇는 통합 메시지 (2~3문장)"
+}`
+}
