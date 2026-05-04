@@ -1,5 +1,6 @@
 import { Sparkles, Heart, Banknote, Activity, Briefcase, Star } from 'lucide-react'
 import { FortuneCard } from './fortune-card'
+import { ShareButton } from './share-button'
 import type { DailyContent } from '@/lib/fortune/types'
 
 const CATEGORIES: Array<[keyof DailyContent['categories'], string, React.ComponentType<{ className?: string }>, string]> = [
@@ -16,6 +17,13 @@ export function FortuneCardDaily({ data }: { data: DailyContent }) {
       accentBg="bg-[#FFE3E1]"
       cardBg="bg-[#FFF5F4]"
       icon={<Sparkles className="size-[18px] text-fortune-critical-strong" />}
+      toolbar={
+        <ShareButton
+          imageUrl="/api/og/daily"
+          title="오늘의 운세"
+          text={`오늘의 운세 · ${data.headline} · 키워드 ${data.lucky_keyword}`}
+        />
+      }
       collapsedPreview={
         <>
           <p className="text-lg font-medium text-fortune-ink leading-snug">{data.headline}</p>

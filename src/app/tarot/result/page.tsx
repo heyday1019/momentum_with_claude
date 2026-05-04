@@ -1,9 +1,10 @@
 import { Suspense } from 'react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { BackButton } from '@/components/fortune/back-button'
+import { ShareButton } from '@/components/fortune/share-button'
 import { TarotCardDisplay } from '@/components/fortune/tarot-card'
 import { TarotDrawButton } from '@/components/fortune/tarot-draw-button'
-import { deserializeDraws } from '@/lib/tarot/draw'
+import { deserializeDraws, serializeDraws } from '@/lib/tarot/draw'
 import { SPREAD_POSITIONS, POSITION_LABELS, type DrawnCard } from '@/lib/tarot/types'
 import { getTarotReading, type TarotInterpretation } from '@/app/actions/tarot'
 
@@ -68,11 +69,20 @@ async function ReadingSection({ draws }: { draws: DrawnCard[] }) {
     )
   }
 
+  const shareUrl = `/api/og/tarot?d=${encodeURIComponent(serializeDraws(draws))}&h=${encodeURIComponent(reading.headline)}`
+
   return (
     <section className="flex flex-col gap-4">
-      <div className="rounded-2xl bg-fortune-surface-soft p-5 flex flex-col gap-1">
-        <span className="text-xs font-bold text-fortune-steel">오늘의 메시지</span>
-        <p className="text-lg font-medium text-fortune-ink-deep leading-snug">{reading.headline}</p>
+      <div className="rounded-2xl bg-fortune-surface-soft p-5 flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-1 flex-1">
+          <span className="text-xs font-bold text-fortune-steel">오늘의 메시지</span>
+          <p className="text-lg font-medium text-fortune-ink-deep leading-snug">{reading.headline}</p>
+        </div>
+        <ShareButton
+          imageUrl={shareUrl}
+          title="오늘의 타로 3장"
+          text={`타로 3장 · ${reading.headline}`}
+        />
       </div>
 
       {SPREAD_POSITIONS.map((pos, i) => (

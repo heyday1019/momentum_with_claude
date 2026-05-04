@@ -1,6 +1,7 @@
 import { Ticket } from 'lucide-react'
 import { FortuneCard } from './fortune-card'
 import { LottoNumberChip } from './lotto-number-chip'
+import { ShareButton } from './share-button'
 import type { LottoResult } from '@/lib/fortune/types'
 
 export function FortuneCardLotto({ data }: { data: LottoResult }) {
@@ -10,6 +11,13 @@ export function FortuneCardLotto({ data }: { data: LottoResult }) {
       accentBg="bg-[#FFF4D6]"
       cardBg="bg-[#FFFAE5]"
       icon={<Ticket className="size-[18px] text-[#80531C]" />}
+      toolbar={
+        <ShareButton
+          imageUrl="/api/og/lotto"
+          title="행운의 로또번호"
+          text={`${data.draw_number}회차 추천 · ${data.numbers.join(', ')}`}
+        />
+      }
       collapsedPreview={
         <>
           <span className="text-sm text-fortune-steel">{data.draw_number}회차 추천</span>

@@ -1,5 +1,6 @@
 import { MoonStar, Star } from 'lucide-react'
 import { FortuneCard } from './fortune-card'
+import { ShareButton } from './share-button'
 import type { ZodiacContent } from '@/lib/fortune/types'
 
 export function FortuneCardZodiac({ data }: { data: ZodiacContent }) {
@@ -9,6 +10,13 @@ export function FortuneCardZodiac({ data }: { data: ZodiacContent }) {
       accentBg="bg-[#E6F0FA]"
       cardBg="bg-[#F2F7FC]"
       icon={<MoonStar className="size-[18px] text-fortune-primary-deep" />}
+      toolbar={
+        <ShareButton
+          imageUrl="/api/og/zodiac"
+          title="띠 · 별자리 운세"
+          text={`${data.zodiac_animal}띠 · ${data.zodiac_sign} · ${data.headline}`}
+        />
+      }
       collapsedPreview={
         <>
           <div className="flex gap-1.5">
