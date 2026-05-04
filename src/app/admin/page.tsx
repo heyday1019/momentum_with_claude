@@ -40,6 +40,8 @@ export default async function AdminPage() {
         </div>
 
         <SummaryGrid data={data} />
+        <DailySection items={data.daily} />
+        <TopUsersSection items={data.topUsers} />
         <PersonaSection items={data.personaPreference} />
         <ModelSection items={data.callsByModel} />
         <FeatureSection items={data.callsByFeature} />
@@ -53,10 +55,80 @@ function SummaryGrid({ data }: { data: AdminStats }) {
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-base font-bold text-fortune-ink-deep">전체 요약</h2>
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5">
         <SummaryCard label="가입자" value={`${data.totalUsers}명`} accent="bg-[#F2F7FC]" />
         <SummaryCard label="AI 호출" value={`${data.totalCalls}회`} accent="bg-[#FFF5F4]" />
         <SummaryCard label="총 토큰" value={formatTokens(data.totalTokens)} accent="bg-[#FFFAE5]" />
+        <SummaryCard label="추정 비용" value={`$${data.totalEstimatedUsd.toFixed(3)}`} accent="bg-[#F4ECDD]" />
+      </div>
+    </section>
+  )
+}
+
+function DailySection({ items }: { items: AdminStats['daily'] }) {
+  if (items.length === 0) return null
+  const max = Math.max(...items.map(i => i.count), 1)
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-base font-bold text-fortune-ink-deep">최근 14일 호출 추이</h2>
+      <div className="rounded-2xl border border-fortune-hairline-soft p-5 flex items-end justify-between gap-1 h-44">
+        {items.map(({ date, count }) => {
+          const heightPct = (count / max) * 100
+          const dateNum = Number(date.slice(8, 10))
+          return (
+            <div key={date} className="flex-1 flex flex-col items-center justify-end gap-1.5 h-full">
+              <span className="text-[9px] font-bold text-fortune-charcoal">{count || ''}</span>
+              <div
+                className="w-full rounded-t-md"
+                style={{
+                  height: `${Math.max(heightPct, count > 0 ? 6 : 2)}%`,
+                  background: count > 0
+                    ? 'linear-gradient(180deg, #94BFE8 0%, #5C8AC0 100%)'
+                    : 'rgba(20,22,26,0.06)',
+                }}
+              />
+              <span className="text-[9px] font-bold text-fortune-stone">{dateNum}</span>
+            </div>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+function TopUsersSection({ items }: { items: AdminStats['topUsers'] }) {
+  if (items.length === 0) return null
+  const max = Math.max(...items.map(i => i.calls), 1)
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-base font-bold text-fortune-ink-deep">활동 TOP {items.length}</h2>
+      <div className="rounded-2xl border border-fortune-hairline-soft p-5 flex flex-col gap-3">
+        {items.map((u, i) => (
+          <div key={u.user_id} className="flex items-center gap-3">
+            <span className="size-7 rounded-full bg-fortune-surface-soft inline-flex items-center justify-center text-xs font-bold text-fortune-ink-deep shrink-0">
+              {i + 1}
+            </span>
+            <div className="flex-1 flex flex-col gap-1 min-w-0">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-xs font-bold text-fortune-ink-deep truncate">
+                  {u.name ?? `${u.user_id.slice(0, 8)}…`}
+                </span>
+                <span className="text-[11px] font-bold text-fortune-charcoal shrink-0">
+                  {u.calls}회 · {formatTokens(u.tokens)}
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-fortune-surface-soft overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${(u.calls / max) * 100}%`,
+                    background: 'linear-gradient(90deg, #B85D1A 0%, #E8B894 100%)',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -113,12 +185,12 @@ function ModelSection({ items }: { items: AdminStats['callsByModel'] }) {
     <section className="flex flex-col gap-3">
       <h2 className="text-base font-bold text-fortune-ink-deep">모델별 토큰 사용량</h2>
       <div className="rounded-2xl border border-fortune-hairline-soft p-5 flex flex-col gap-3">
-        {items.map(({ model, count, tokens }) => (
+        {items.map(({ model, count, tokens, estimatedUsd }) => (
           <div key={model} className="flex flex-col gap-1.5">
             <div className="flex items-baseline justify-between gap-2">
               <span className="text-xs font-bold text-fortune-ink-deep truncate">{model}</span>
               <span className="text-xs font-bold text-fortune-charcoal shrink-0">
-                {count}회 · {formatTokens(tokens)}
+                {count}회 · {formatTokens(tokens)} · ${estimatedUsd.toFixed(3)}
               </span>
             </div>
             <div className="h-2.5 rounded-full bg-fortune-surface-soft overflow-hidden">
@@ -132,6 +204,9 @@ function ModelSection({ items }: { items: AdminStats['callsByModel'] }) {
             </div>
           </div>
         ))}
+        <p className="text-[10px] text-fortune-stone text-center pt-1">
+          ※ 비용은 모델 단가 기준 추정값. 실제 청구와 차이 가능.
+        </p>
       </div>
     </section>
   )
