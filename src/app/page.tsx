@@ -36,7 +36,8 @@ async function DailyCard() {
   try {
     const data = await getDailyFortune()
     return <FortuneCardDaily data={data} />
-  } catch {
+  } catch (e) {
+    console.error('[DailyCard] failed:', e)
     return <ErrorCard label="오늘의 운세" />
   }
 }
@@ -44,7 +45,8 @@ async function ZodiacCard() {
   try {
     const data = await getZodiacFortune()
     return <FortuneCardZodiac data={data} />
-  } catch {
+  } catch (e) {
+    console.error('[ZodiacCard] failed:', e)
     return <ErrorCard label="띠 · 별자리" />
   }
 }
@@ -52,7 +54,8 @@ async function LottoCard() {
   try {
     const data = await getLottoRec()
     return <FortuneCardLotto data={data} />
-  } catch {
+  } catch (e) {
+    console.error('[LottoCard] failed:', e)
     return <ErrorCard label="행운의 로또번호" />
   }
 }
