@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_call_log: {
+        Row: {
+          completion_tokens: number | null
+          created_at: string
+          feature: string
+          id: number
+          model: string
+          persona: string | null
+          prompt_tokens: number | null
+          success: boolean
+          total_tokens: number | null
+          user_id: string
+        }
+        Insert: {
+          completion_tokens?: number | null
+          created_at?: string
+          feature: string
+          id?: never
+          model: string
+          persona?: string | null
+          prompt_tokens?: number | null
+          success?: boolean
+          total_tokens?: number | null
+          user_id: string
+        }
+        Update: {
+          completion_tokens?: number | null
+          created_at?: string
+          feature?: string
+          id?: never
+          model?: string
+          persona?: string | null
+          prompt_tokens?: number | null
+          success?: boolean
+          total_tokens?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_call_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dream_ai_usage: {
         Row: {
           created_at: string

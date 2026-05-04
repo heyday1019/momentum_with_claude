@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
+import { logAiCall } from '@/lib/openrouter/log'
 import { todayKst, nextLottoDrawNumber } from '@/lib/fortune/kst'
 import { zodiacAnimal, zodiacSign } from '@/lib/fortune/zodiac'
 import { generateLottoNumbers } from '@/lib/fortune/lotto'
@@ -50,6 +51,7 @@ export async function getDailyFortune(viewer?: ViewerProfile): Promise<DailyCont
     expectJson: true,
     maxTokens: 800,
     temperature: 0.7,
+    onUsage: ({ model, usage }) => logAiCall({ supabase, userId: user.id, feature: 'daily', model, usage }),
   })
 
   if (!viewer) {
@@ -94,6 +96,7 @@ export async function getZodiacFortune(viewer?: ViewerProfile): Promise<ZodiacCo
     expectJson: true,
     maxTokens: 500,
     temperature: 0.7,
+    onUsage: ({ model, usage }) => logAiCall({ supabase, userId: user.id, feature: 'zodiac', model, usage }),
   })
 
   // 모델이 다른 동물/별자리를 반환할 수 있으니 서버 계산값으로 덮어쓰기
@@ -147,6 +150,7 @@ export async function getLottoRec(viewer?: ViewerProfile): Promise<LottoResult> 
     expectJson: true,
     maxTokens: 200,
     temperature: 0.5,
+    onUsage: ({ model, usage }) => logAiCall({ supabase, userId: user.id, feature: 'lotto', model, usage }),
   })
 
   if (!viewer) {

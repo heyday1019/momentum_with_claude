@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
+import { logAiCall } from '@/lib/openrouter/log'
 import { todayKst } from '@/lib/fortune/kst'
 import { SYSTEM_PROMPT, buildTarotPrompt, buildTarotOneCardPrompt, type TarotPromptCard } from '@/lib/fortune/prompts'
 import { POSITION_LABELS, SPREAD_POSITIONS, type DrawnCard } from '@/lib/tarot/types'
@@ -45,6 +46,7 @@ export async function getTarotReading(draws: DrawnCard[]): Promise<TarotInterpre
     expectJson: true,
     maxTokens: 1200,
     temperature: 0.7,
+    onUsage: ({ model, usage }) => logAiCall({ supabase, userId: user.id, feature: 'tarot_three', model, usage }),
   })
 
   return result
@@ -89,6 +91,7 @@ export async function getTarotOneCardReading(draws: DrawnCard[]): Promise<TarotO
     expectJson: true,
     maxTokens: 600,
     temperature: 0.7,
+    onUsage: ({ model, usage }) => logAiCall({ supabase, userId: user.id, feature: 'tarot_one', model, usage }),
   })
 
   return result

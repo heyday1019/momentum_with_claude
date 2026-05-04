@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
+import { logAiCall } from '@/lib/openrouter/log'
 import { todayKst } from '@/lib/fortune/kst'
 import { DREAM_PERSONA_PROMPTS, buildDreamPrompt } from '@/lib/fortune/prompts'
 import { DREAM_PERSONAS, type DreamPersonaKey } from '@/lib/fortune/dream-personas'
@@ -70,6 +71,8 @@ export async function getDreamInterpretation(input: {
       maxTokens: 1200,
       temperature: 0.75,
       model: meta.model,
+      onUsage: ({ model, usage }) =>
+        logAiCall({ supabase, userId: user.id, feature: 'dream', persona, model, usage }),
     })
 
     const { error: usageErr } = await usagePromise

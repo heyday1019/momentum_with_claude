@@ -1,6 +1,12 @@
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 const DEFAULT_MODEL = 'anthropic/claude-haiku-4-5'
 
+export interface CallUsage {
+  prompt_tokens?: number
+  completion_tokens?: number
+  total_tokens?: number
+}
+
 export interface CallOptions {
   systemPrompt: string
   userPrompt: string
@@ -11,6 +17,8 @@ export interface CallOptions {
   timeoutMs?: number
   /** OpenRouter 모델 식별자. 미지정 시 anthropic/claude-haiku-4-5 */
   model?: string
+  /** 응답 토큰 정보 콜백 (성공 시 1회 호출). 로깅 용도. */
+  onUsage?: (info: { model: string; usage: CallUsage }) => void | Promise<void>
   /** 의존성 주입용 (테스트). 기본 globalThis.fetch */
   fetchImpl?: typeof fetch
 }
@@ -77,7 +85,7 @@ export async function callFortuneModel<T>(opts: CallOptions): Promise<T> {
 
   const timeoutMs = opts.timeoutMs ?? 15000
 
-  const callOnce = async (): Promise<T> => {
+  const callOnce = async (): Promise<{ data: T; usage: CallUsage; model: string }> => {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), timeoutMs)
     try {
@@ -90,21 +98,37 @@ export async function callFortuneModel<T>(opts: CallOptions): Promise<T> {
       if (!res.ok) {
         throw new OpenRouterError(`OpenRouter ${res.status}`, res.status)
       }
-      const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> }
+      const json = await res.json() as {
+        model?: string
+        choices?: Array<{ message?: { content?: string } }>
+        usage?: CallUsage
+      }
       const content = json.choices?.[0]?.message?.content
       if (!content) throw new OpenRouterError('Empty response')
-      return parseJsonLoose<T>(content)
+      return {
+        data: parseJsonLoose<T>(content),
+        usage: json.usage ?? {},
+        model: json.model ?? body.model,
+      }
     } finally {
       clearTimeout(timer)
     }
   }
 
+  let result: { data: T; usage: CallUsage; model: string }
   try {
-    return await callOnce()
+    result = await callOnce()
   } catch (e) {
     if (e instanceof OpenRouterError && e.status && e.status >= 400 && e.status < 500 && e.status !== 429) {
       throw e
     }
-    return await callOnce()
+    result = await callOnce()
   }
+
+  if (opts.onUsage) {
+    try { await opts.onUsage({ model: result.model, usage: result.usage }) }
+    catch (err) { console.error('[openrouter/onUsage] failed:', err) }
+  }
+
+  return result.data
 }
