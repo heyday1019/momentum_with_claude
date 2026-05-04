@@ -1,5 +1,5 @@
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
-const MODEL = 'anthropic/claude-haiku-4-5'
+const DEFAULT_MODEL = 'anthropic/claude-haiku-4-5'
 
 export interface CallOptions {
   systemPrompt: string
@@ -9,6 +9,8 @@ export interface CallOptions {
   maxTokens?: number
   temperature?: number
   timeoutMs?: number
+  /** OpenRouter 모델 식별자. 미지정 시 anthropic/claude-haiku-4-5 */
+  model?: string
   /** 의존성 주입용 (테스트). 기본 globalThis.fetch */
   fetchImpl?: typeof fetch
 }
@@ -56,7 +58,7 @@ export async function callFortuneModel<T>(opts: CallOptions): Promise<T> {
   const fetchImpl = opts.fetchImpl ?? fetch
 
   const body = {
-    model: MODEL,
+    model: opts.model ?? DEFAULT_MODEL,
     messages: [
       { role: 'system', content: opts.systemPrompt },
       { role: 'user', content: opts.userPrompt },

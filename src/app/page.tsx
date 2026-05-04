@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { Users, ArrowRight, Sparkles, History, BarChart3 } from 'lucide-react'
+import { Users, ArrowRight, Sparkles, History, BarChart3, Moon } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { CardSkeleton } from '@/components/fortune/card-skeleton'
 import { FortuneCardDaily } from '@/components/fortune/fortune-card-daily'
@@ -41,6 +41,21 @@ export default async function HomePage() {
           <span className="flex-1 flex flex-col gap-0.5">
             <span className="text-base font-bold">오늘의 타로 3장</span>
             <span className="text-sm font-bold opacity-80">과거 · 현재 · 미래의 흐름 보기</span>
+          </span>
+          <ArrowRight className="size-5 opacity-70" />
+        </Link>
+
+        <Link
+          href="/dream"
+          className="rounded-[32px] p-6 flex items-center gap-4 text-fortune-canvas"
+          style={{ backgroundImage: 'linear-gradient(135deg, #2A2A60 0%, #3F3FAA 100%)' }}
+        >
+          <span className="size-12 rounded-full bg-white/10 inline-flex items-center justify-center shrink-0">
+            <Moon className="size-5" />
+          </span>
+          <span className="flex-1 flex flex-col gap-0.5">
+            <span className="text-base font-bold">꿈 해몽</span>
+            <span className="text-sm font-bold opacity-80">어젯밤 꿈을 적으면 풀어드려요</span>
           </span>
           <ArrowRight className="size-5 opacity-70" />
         </Link>

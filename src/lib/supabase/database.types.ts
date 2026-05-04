@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      dream_ai_usage: {
+        Row: {
+          created_at: string
+          id: number
+          model: string
+          persona: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          model: string
+          persona: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          model?: string
+          persona?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dream_ai_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fortune_daily: {
         Row: {
           content: Json
