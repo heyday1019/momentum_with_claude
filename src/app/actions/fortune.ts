@@ -35,14 +35,13 @@ export async function getDailyFortune(viewer?: ViewerProfile): Promise<DailyCont
   const today = todayKst()
 
   if (!viewer) {
-    const { data: cached } = await supabase
+    const { data, error } = await supabase
       .from('fortune_daily')
       .select('content')
-      .eq('user_id', user.id)
-      .eq('date', today)
-      .eq('fortune_type', 'daily')
-      .maybeSingle()
-    if (cached) return cached.content as unknown as DailyContent
+      .match({ user_id: user.id, date: today, fortune_type: 'daily' })
+      .limit(1)
+    if (error) console.error('[fortune_daily/daily] select error:', error)
+    if (data && data.length > 0) return data[0].content as unknown as DailyContent
   }
 
   const result = await callFortuneModel<DailyContent>({
@@ -54,12 +53,13 @@ export async function getDailyFortune(viewer?: ViewerProfile): Promise<DailyCont
   })
 
   if (!viewer) {
-    await supabase.from('fortune_daily').insert({
+    const { error: insertErr } = await supabase.from('fortune_daily').insert({
       user_id: user.id,
       date: today,
       fortune_type: 'daily',
       content: result as unknown as Json,
     })
+    if (insertErr) console.error('[fortune_daily/daily] insert error:', insertErr)
   }
 
   return result
@@ -71,14 +71,13 @@ export async function getZodiacFortune(viewer?: ViewerProfile): Promise<ZodiacCo
   const today = todayKst()
 
   if (!viewer) {
-    const { data: cached } = await supabase
+    const { data, error } = await supabase
       .from('fortune_daily')
       .select('content')
-      .eq('user_id', user.id)
-      .eq('date', today)
-      .eq('fortune_type', 'zodiac')
-      .maybeSingle()
-    if (cached) return cached.content as unknown as ZodiacContent
+      .match({ user_id: user.id, date: today, fortune_type: 'zodiac' })
+      .limit(1)
+    if (error) console.error('[fortune_daily/zodiac] select error:', error)
+    if (data && data.length > 0) return data[0].content as unknown as ZodiacContent
   }
 
   const animal = zodiacAnimal(target.birthdate)
@@ -101,12 +100,13 @@ export async function getZodiacFortune(viewer?: ViewerProfile): Promise<ZodiacCo
   const safe: ZodiacContent = { ...result, zodiac_animal: animal, zodiac_sign: sign }
 
   if (!viewer) {
-    await supabase.from('fortune_daily').insert({
+    const { error: insertErr } = await supabase.from('fortune_daily').insert({
       user_id: user.id,
       date: today,
       fortune_type: 'zodiac',
       content: safe as unknown as Json,
     })
+    if (insertErr) console.error('[fortune_daily/zodiac] insert error:', insertErr)
   }
 
   return safe
@@ -119,16 +119,16 @@ export async function getLottoRec(viewer?: ViewerProfile): Promise<LottoResult> 
   const drawNumber = nextLottoDrawNumber()
 
   if (!viewer) {
-    const { data: cached } = await supabase
+    const { data, error } = await supabase
       .from('lotto_recommendations')
       .select('numbers, comment, draw_number')
-      .eq('user_id', user.id)
-      .eq('draw_number', drawNumber)
-      .maybeSingle()
-    if (cached) return {
-      draw_number: cached.draw_number,
-      numbers: cached.numbers as number[],
-      comment: cached.comment,
+      .match({ user_id: user.id, draw_number: drawNumber })
+      .limit(1)
+    if (error) console.error('[lotto_recommendations] select error:', error)
+    if (data && data.length > 0) return {
+      draw_number: data[0].draw_number,
+      numbers: data[0].numbers as number[],
+      comment: data[0].comment,
     }
   }
 
@@ -150,12 +150,13 @@ export async function getLottoRec(viewer?: ViewerProfile): Promise<LottoResult> 
   })
 
   if (!viewer) {
-    await supabase.from('lotto_recommendations').insert({
+    const { error: insertErr } = await supabase.from('lotto_recommendations').insert({
       user_id: user.id,
       draw_number: drawNumber,
       numbers,
       comment,
     })
+    if (insertErr) console.error('[lotto_recommendations] insert error:', insertErr)
   }
 
   return { draw_number: drawNumber, numbers, comment }
