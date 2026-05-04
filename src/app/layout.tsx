@@ -1,9 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "운세 — 오늘의 나, 가볍게",
   description: "매일 자정에 새 운세가 도착해요. 친한 멘토가 옆에서 짚어주듯, 따뜻하게.",
+  applicationName: "Momentum",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Momentum",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1A1B3D",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
