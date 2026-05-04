@@ -6,6 +6,8 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 interface Props {
   title: string
   accentBg: string
+  /** 카드 전체 배경 (Tailwind class). 미지정 시 흰색. */
+  cardBg?: string
   icon: ReactNode
   collapsedPreview: ReactNode
   expandedContent: ReactNode
@@ -14,11 +16,11 @@ interface Props {
 }
 
 export function FortuneCard({
-  title, accentBg, icon, collapsedPreview, expandedContent, defaultOpen = false, toolbar,
+  title, accentBg, cardBg = 'bg-fortune-canvas', icon, collapsedPreview, expandedContent, defaultOpen = false, toolbar,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <section className="rounded-[32px] border border-fortune-hairline-soft bg-fortune-canvas p-6 flex flex-col gap-3">
+    <section className={`rounded-[32px] border border-fortune-hairline-soft p-6 flex flex-col gap-3 ${cardBg}`}>
       <header className="flex items-center justify-between gap-3">
         <button
           type="button"

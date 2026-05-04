@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
+import { BackButton } from '@/components/fortune/back-button'
 import { TarotCardDisplay } from '@/components/fortune/tarot-card'
 import { TarotDrawButton } from '@/components/fortune/tarot-draw-button'
 import { deserializeDraws } from '@/lib/tarot/draw'
@@ -33,13 +32,7 @@ export default async function TarotResultPage({ searchParams }: PageProps) {
     <main className="flex min-h-screen flex-col bg-fortune-canvas">
       <AppHeader />
       <section className="flex flex-col gap-6 px-4 py-6">
-        <Link
-          href="/tarot"
-          className="inline-flex items-center gap-1 text-sm font-bold text-fortune-steel w-fit"
-        >
-          <ArrowLeft className="size-4" />
-          타로 메인
-        </Link>
+        <BackButton href="/tarot" label="타로 메인" />
 
         <h1 className="text-[24px] font-medium leading-tight text-fortune-ink-deep">
           뽑힌 카드 3장

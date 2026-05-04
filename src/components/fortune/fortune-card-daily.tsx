@@ -14,6 +14,7 @@ export function FortuneCardDaily({ data }: { data: DailyContent }) {
     <FortuneCard
       title="오늘의 운세"
       accentBg="bg-[#FFE3E1]"
+      cardBg="bg-[#FFF5F4]"
       icon={<Sparkles className="size-[18px] text-fortune-critical-strong" />}
       collapsedPreview={
         <>

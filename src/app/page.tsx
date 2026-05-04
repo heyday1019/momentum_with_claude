@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { Users, ArrowRight, Sparkles } from 'lucide-react'
+import { Users, ArrowRight, Sparkles, History } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { CardSkeleton } from '@/components/fortune/card-skeleton'
 import { FortuneCardDaily } from '@/components/fortune/fortune-card-daily'
@@ -24,7 +24,7 @@ export default async function HomePage() {
           <h1 className="text-[28px] font-light leading-tight text-fortune-ink-deep">
             {profile?.name}님, 오늘의 운세예요
           </h1>
-          <p className="text-sm text-fortune-steel">{today}</p>
+          <p className="text-sm font-bold text-fortune-charcoal">{today}</p>
         </div>
         <Suspense fallback={<CardSkeleton />}><DailyCard /></Suspense>
         <Suspense fallback={<CardSkeleton />}><ZodiacCard /></Suspense>
@@ -40,23 +40,39 @@ export default async function HomePage() {
           </span>
           <span className="flex-1 flex flex-col gap-0.5">
             <span className="text-base font-bold">오늘의 타로 3장</span>
-            <span className="text-sm opacity-70">과거 · 현재 · 미래의 흐름 보기</span>
+            <span className="text-sm font-bold opacity-80">과거 · 현재 · 미래의 흐름 보기</span>
           </span>
           <ArrowRight className="size-5 opacity-70" />
         </Link>
 
         <Link
           href="/lookup"
-          className="rounded-[32px] border border-fortune-hairline-soft bg-fortune-surface-soft p-6 flex items-center gap-4"
+          className="rounded-[32px] border p-6 flex items-center gap-4"
+          style={{ backgroundColor: '#EAF2FB', borderColor: '#C9DAEE' }}
         >
           <span className="size-12 rounded-full bg-fortune-canvas inline-flex items-center justify-center shrink-0">
             <Users className="size-5 text-fortune-primary-deep" />
           </span>
           <span className="flex-1 flex flex-col gap-0.5">
             <span className="text-base font-bold text-fortune-ink-deep">친구·가족 운세 보기</span>
-            <span className="text-sm text-fortune-steel">이름과 생일만 알면 OK</span>
+            <span className="text-sm font-bold text-fortune-charcoal">이름과 생일만 알면 OK</span>
           </span>
-          <ArrowRight className="size-5 text-fortune-steel" />
+          <ArrowRight className="size-5 text-fortune-charcoal" />
+        </Link>
+
+        <Link
+          href="/history"
+          className="rounded-[32px] border p-6 flex items-center gap-4"
+          style={{ backgroundColor: '#F4ECDD', borderColor: '#E0D2B5' }}
+        >
+          <span className="size-12 rounded-full bg-fortune-canvas inline-flex items-center justify-center shrink-0">
+            <History className="size-5 text-[#80531C]" />
+          </span>
+          <span className="flex-1 flex flex-col gap-0.5">
+            <span className="text-base font-bold text-fortune-ink-deep">지난 운세 기록</span>
+            <span className="text-sm font-bold text-fortune-charcoal">최근 30일 모아보기</span>
+          </span>
+          <ArrowRight className="size-5 text-fortune-charcoal" />
         </Link>
       </section>
     </main>

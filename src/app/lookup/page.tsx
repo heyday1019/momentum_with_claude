@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
+import { BackButton } from '@/components/fortune/back-button'
 import { CardSkeleton } from '@/components/fortune/card-skeleton'
 import { FortuneCardDaily } from '@/components/fortune/fortune-card-daily'
 import { FortuneCardZodiac } from '@/components/fortune/fortune-card-zodiac'
@@ -33,18 +32,12 @@ export default async function LookupPage({ searchParams }: PageProps) {
         {showResult ? (
           <>
             <div className="flex flex-col gap-3 pb-1">
-              <Link
-                href="/lookup"
-                className="inline-flex items-center gap-1 text-sm font-bold text-fortune-steel w-fit"
-              >
-                <ArrowLeft className="size-4" />
-                다른 사람 검색
-              </Link>
+              <BackButton href="/lookup" label="다른 사람 검색" />
               <div className="flex flex-col gap-1">
                 <h1 className="text-[28px] font-light leading-tight text-fortune-ink-deep">
                   {candidate.name}님의 오늘 운세
                 </h1>
-                <p className="text-sm text-fortune-steel">{today}</p>
+                <p className="text-sm font-bold text-fortune-charcoal">{today}</p>
               </div>
             </div>
             <Suspense fallback={<CardSkeleton />}><DailyCard viewer={candidate} /></Suspense>
@@ -53,18 +46,12 @@ export default async function LookupPage({ searchParams }: PageProps) {
           </>
         ) : (
           <>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1 text-sm font-bold text-fortune-steel w-fit"
-            >
-              <ArrowLeft className="size-4" />
-              홈
-            </Link>
+            <BackButton href="/" label="홈" />
             <div className="flex flex-col gap-1 pb-1">
               <h1 className="text-[28px] font-light leading-tight text-fortune-ink-deep">
                 다른 사람의 운세
               </h1>
-              <p className="text-sm text-fortune-steel">친구·가족 정보를 입력하면 오늘의 운세를 보여드릴게요</p>
+              <p className="text-sm font-bold text-fortune-charcoal">친구·가족 정보를 입력하면 오늘의 운세를 보여드릴게요</p>
             </div>
             {validationError && (
               <p className="text-sm text-fortune-critical-strong">{validationError}</p>

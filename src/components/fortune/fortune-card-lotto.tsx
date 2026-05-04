@@ -8,6 +8,7 @@ export function FortuneCardLotto({ data }: { data: LottoResult }) {
     <FortuneCard
       title="행운의 로또번호"
       accentBg="bg-[#FFF4D6]"
+      cardBg="bg-[#FFFAE5]"
       icon={<Ticket className="size-[18px] text-[#80531C]" />}
       collapsedPreview={
         <>

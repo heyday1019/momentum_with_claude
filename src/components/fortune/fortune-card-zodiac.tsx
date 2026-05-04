@@ -7,6 +7,7 @@ export function FortuneCardZodiac({ data }: { data: ZodiacContent }) {
     <FortuneCard
       title="띠 · 별자리"
       accentBg="bg-[#E6F0FA]"
+      cardBg="bg-[#F2F7FC]"
       icon={<MoonStar className="size-[18px] text-fortune-primary-deep" />}
       collapsedPreview={
         <>
