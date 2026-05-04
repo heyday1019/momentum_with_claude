@@ -1,12 +1,14 @@
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Shield } from 'lucide-react'
 import { ProfileForm } from '@/components/fortune/profile-form'
 import { AccountActions } from '@/components/fortune/account-actions'
 import { getMyProfile, signOut } from '@/app/actions/profile'
+import { checkIsAdmin } from '@/app/actions/admin'
 
 export default async function MePage() {
   const profile = await getMyProfile()
   if (!profile) return null
+  const isAdmin = await checkIsAdmin()
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -24,6 +26,21 @@ export default async function MePage() {
         />
 
         <hr className="border-fortune-hairline-soft" />
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="rounded-2xl border border-fortune-ink-deep bg-fortune-ink-deep p-4 flex items-center gap-3 text-fortune-canvas"
+          >
+            <span className="size-10 rounded-full bg-white/15 inline-flex items-center justify-center shrink-0">
+              <Shield className="size-4" />
+            </span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-bold">관리자 대시보드</span>
+              <span className="text-xs font-bold opacity-80">전체 사용자 활동 + 토큰 통계</span>
+            </div>
+          </Link>
+        )}
 
         <AccountActions />
 
