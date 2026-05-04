@@ -44,6 +44,41 @@ describe('callFortuneModel', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(2)
   })
 
+  it('strips ```json code fences before parsing', async () => {
+    const fenced = '```json\n{"headline":"hi","body":"there"}\n```'
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: fenced } }] }),
+    } as Response)
+
+    const out = await callFortuneModel<{ headline: string; body: string }>({
+      systemPrompt: 's',
+      userPrompt: 'u',
+      expectJson: true,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    })
+    expect(out.headline).toBe('hi')
+    expect(out.body).toBe('there')
+  })
+
+  it('extracts the first {…} block when wrapped in prose', async () => {
+    const wrapped = 'Sure! Here is the JSON:\n{"ok":1}\nLet me know if you need more.'
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: wrapped } }] }),
+    } as Response)
+
+    const out = await callFortuneModel<{ ok: number }>({
+      systemPrompt: 's',
+      userPrompt: 'u',
+      expectJson: true,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    })
+    expect(out.ok).toBe(1)
+  })
+
   it('throws OpenRouterError if API key missing', async () => {
     delete process.env.OPENROUTER_API_KEY
     await expect(
