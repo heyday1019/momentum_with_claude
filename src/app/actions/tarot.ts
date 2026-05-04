@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
 import { todayKst } from '@/lib/fortune/kst'
-import { SYSTEM_PROMPT, buildTarotPrompt, type TarotPromptCard } from '@/lib/fortune/prompts'
+import { SYSTEM_PROMPT, buildTarotPrompt, buildTarotOneCardPrompt, type TarotPromptCard } from '@/lib/fortune/prompts'
 import { POSITION_LABELS, SPREAD_POSITIONS, type DrawnCard } from '@/lib/tarot/types'
 import type { Gender } from '@/lib/fortune/types'
 
@@ -44,6 +44,50 @@ export async function getTarotReading(draws: DrawnCard[]): Promise<TarotInterpre
     }),
     expectJson: true,
     maxTokens: 1200,
+    temperature: 0.7,
+  })
+
+  return result
+}
+
+export interface TarotOneCardInterpretation {
+  headline: string
+  interpretation: string
+  advice: string
+}
+
+/** 1장 데일리 해석 (DB 저장 안 함, 매번 신선) */
+export async function getTarotOneCardReading(draws: DrawnCard[]): Promise<TarotOneCardInterpretation> {
+  if (draws.length !== 1) throw new Error('INVALID_DRAW')
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('UNAUTHENTICATED')
+  const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  if (!profileRow) throw new Error('NO_PROFILE')
+  const profile = profileRow as { name: string; birthdate: string; gender: Gender }
+
+  const today = todayKst()
+  const drawn = draws[0]
+  const card: TarotPromptCard = {
+    position: '오늘',
+    name_kr: drawn.card.name_kr,
+    name_en: drawn.card.name_en,
+    orientation: drawn.orientation === 'upright' ? '정방향' : '역방향',
+    baseMeaning: drawn.orientation === 'upright' ? drawn.card.upright : drawn.card.reversed,
+  }
+
+  const result = await callFortuneModel<TarotOneCardInterpretation>({
+    systemPrompt: SYSTEM_PROMPT,
+    userPrompt: buildTarotOneCardPrompt({
+      name: profile.name,
+      birthdate: profile.birthdate,
+      gender: profile.gender,
+      today,
+      card,
+    }),
+    expectJson: true,
+    maxTokens: 600,
     temperature: 0.7,
   })
 

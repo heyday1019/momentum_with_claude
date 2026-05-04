@@ -1,6 +1,6 @@
 import { AppHeader } from '@/components/fortune/app-header'
 import { BackButton } from '@/components/fortune/back-button'
-import { TarotDrawButton } from '@/components/fortune/tarot-draw-button'
+import { TarotSpreadPicker } from '@/components/fortune/tarot-spread-picker'
 
 export default function TarotEntryPage() {
   return (
@@ -28,10 +28,10 @@ export default function TarotEntryPage() {
           <CardBackTriple />
         </div>
 
-        <TarotDrawButton />
+        <TarotSpreadPicker />
 
         <p className="text-xs text-fortune-stone leading-relaxed text-center">
-          매번 새로운 무작위 결과예요. 결과는 저장되지 않아요.
+          78장 풀덱에서 무작위로 뽑아요. 결과는 저장되지 않아요.
         </p>
       </section>
     </main>

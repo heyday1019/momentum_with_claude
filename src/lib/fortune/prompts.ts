@@ -77,11 +77,37 @@ JSON 스키마:
 }
 
 export interface TarotPromptCard {
-  position: '과거' | '현재' | '미래'
+  position: '과거' | '현재' | '미래' | '오늘'
   name_kr: string
   name_en: string
   orientation: '정방향' | '역방향'
   baseMeaning: string
+}
+
+export function buildTarotOneCardPrompt(args: {
+  name: string
+  birthdate: string
+  gender: Gender
+  today: string
+  card: TarotPromptCard
+}): string {
+  const c = args.card
+  return `${args.name}님(생년월일 ${args.birthdate}, ${GENDER_KO[args.gender]})의 ${args.today} 오늘의 카드 1장 풀이해주세요.
+
+뽑힌 카드:
+- ${c.name_kr} (${c.name_en}, ${c.orientation}) — 기본 의미: ${c.baseMeaning}
+
+[작성 가이드]
+- 카드의 기본 의미를 사용자의 일상 맥락에 연결.
+- 역방향은 부정적이라기보다 "주의 신호" 또는 "안으로 향하는 측면"으로.
+- 의학·법률·금융 단정 금지, 위협적인 단어 자제.
+
+JSON 스키마:
+{
+  "headline": "한 줄 요약 (20~40자)",
+  "interpretation": "오늘의 카드 풀이 (3~4문장)",
+  "advice": "오늘 하루를 위한 짧은 조언 (1~2문장)"
+}`
 }
 
 export function buildTarotPrompt(args: {
