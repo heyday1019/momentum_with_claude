@@ -3,11 +3,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { todayKst } from '@/lib/fortune/kst'
 import type { Json } from '@/lib/supabase/database.types'
+import type { DreamPersonaKey } from '@/lib/fortune/dream-personas'
 
 export interface KeywordStat {
   keyword: string
   count: number
 }
+
+export type DreamPersonaUsage = Record<DreamPersonaKey, number>
 
 export interface InsightsData {
   /** 일일 운세 본 고유 날짜 수 */
@@ -20,6 +23,8 @@ export interface InsightsData {
   topKeywords: KeywordStat[]
   /** [월, 화, 수, 목, 금, 토, 일] 7개 카운트 (일일 기준 고유 날짜) */
   byWeekday: number[]
+  /** 꿈 해몽 AI 페르소나별 사용 횟수 */
+  dreamUsage: DreamPersonaUsage
 }
 
 const EMPTY: InsightsData = {
@@ -28,6 +33,7 @@ const EMPTY: InsightsData = {
   firstSeenDate: null,
   topKeywords: [],
   byWeekday: [0, 0, 0, 0, 0, 0, 0],
+  dreamUsage: { master: 0, fortune: 0, fairy: 0 },
 }
 
 export async function getMyInsights(): Promise<InsightsData> {
@@ -70,13 +76,37 @@ export async function getMyInsights(): Promise<InsightsData> {
   const firstSeenDate = sortedDates[0] ?? null
   const currentStreak = computeStreak(dailyDates, todayKst())
 
+  const dreamUsage = await loadDreamUsage(supabase, user.id)
+
   return {
     totalDays: dailyDates.size,
     currentStreak,
     firstSeenDate,
     topKeywords,
     byWeekday,
+    dreamUsage,
   }
+}
+
+async function loadDreamUsage(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<DreamPersonaUsage> {
+  const counts: DreamPersonaUsage = { master: 0, fortune: 0, fairy: 0 }
+  const { data, error } = await supabase
+    .from('dream_ai_usage')
+    .select('persona')
+    .eq('user_id', userId)
+  if (error) {
+    console.error('[insights/dream_ai_usage] select error:', error)
+    return counts
+  }
+  if (!data) return counts
+  for (const row of data) {
+    const p = row.persona as DreamPersonaKey | string
+    if (p === 'master' || p === 'fortune' || p === 'fairy') counts[p] += 1
+  }
+  return counts
 }
 
 function extractKeyword(content: Json): string | null {

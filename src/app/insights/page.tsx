@@ -1,13 +1,16 @@
+import Image from 'next/image'
 import { BarChart3 } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { BackButton } from '@/components/fortune/back-button'
-import { getMyInsights, type InsightsData, type KeywordStat } from '@/app/actions/insights'
+import { getMyInsights, type InsightsData, type KeywordStat, type DreamPersonaUsage } from '@/app/actions/insights'
+import { DREAM_PERSONAS } from '@/lib/fortune/dream-personas'
 
 const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'] as const
 
 export default async function InsightsPage() {
   const data = await getMyInsights()
-  const isEmpty = data.totalDays === 0
+  const totalDream = data.dreamUsage.master + data.dreamUsage.fortune + data.dreamUsage.fairy
+  const isEmpty = data.totalDays === 0 && totalDream === 0
 
   return (
     <main className="flex min-h-screen flex-col bg-fortune-canvas">
@@ -26,9 +29,10 @@ export default async function InsightsPage() {
 
         {isEmpty ? <EmptyState /> : (
           <>
-            <SummarySection data={data} />
-            <KeywordsSection items={data.topKeywords} />
-            <WeekdaySection counts={data.byWeekday} />
+            {data.totalDays > 0 && <SummarySection data={data} />}
+            {data.topKeywords.length > 0 && <KeywordsSection items={data.topKeywords} />}
+            {data.totalDays > 0 && <WeekdaySection counts={data.byWeekday} />}
+            {totalDream > 0 && <DreamUsageSection usage={data.dreamUsage} total={totalDream} />}
           </>
         )}
       </section>
@@ -120,6 +124,64 @@ function WeekdaySection({ counts }: { counts: number[] }) {
             </div>
           )
         })}
+      </div>
+    </section>
+  )
+}
+
+function DreamUsageSection({ usage, total }: { usage: DreamPersonaUsage; total: number }) {
+  const max = Math.max(usage.master, usage.fortune, usage.fairy, 1)
+  const topKey = (Object.entries(usage) as [keyof DreamPersonaUsage, number][])
+    .sort((a, b) => b[1] - a[1])[0]
+  const topPersona = DREAM_PERSONAS.find(p => p.key === topKey[0])
+
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-base font-bold text-fortune-ink-deep">꿈 해몽 AI 사용</h2>
+      <div className="rounded-2xl border border-fortune-hairline-soft p-5 flex flex-col gap-4">
+        {topPersona && total > 0 && (
+          <div className="flex items-center gap-3 rounded-xl bg-fortune-surface-soft p-3">
+            <div className="relative size-12 rounded-full overflow-hidden shrink-0 bg-fortune-canvas">
+              <Image src={topPersona.image} alt={topPersona.label} fill sizes="48px" className="object-cover" />
+            </div>
+            <div className="flex flex-col gap-0.5 flex-1">
+              <span className="text-xs font-bold text-fortune-charcoal">가장 많이 부른 분</span>
+              <span className="text-sm font-bold text-fortune-ink-deep">{topPersona.label} · {topKey[1]}회</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3">
+          {DREAM_PERSONAS.map(p => {
+            const count = usage[p.key]
+            return (
+              <div key={p.key} className="flex items-center gap-3">
+                <div className="relative size-10 rounded-full overflow-hidden shrink-0 bg-fortune-surface-soft">
+                  <Image src={p.image} alt={p.label} fill sizes="40px" className="object-cover" />
+                </div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-sm font-bold text-fortune-ink-deep truncate">{p.label}</span>
+                    <span className="text-xs font-bold text-fortune-charcoal shrink-0">{count}회</span>
+                  </div>
+                  <div className="h-2.5 rounded-full bg-fortune-surface-soft overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: count > 0 ? `${(count / max) * 100}%` : '0%',
+                        background: 'linear-gradient(90deg, #5C3FB8 0%, #9577E0 100%)',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <p className="text-xs font-bold text-fortune-charcoal text-center pt-1">
+          총 {total}회 풀이
+        </p>
       </div>
     </section>
   )
