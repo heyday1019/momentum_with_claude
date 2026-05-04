@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { Users, ArrowRight, Sparkles, History } from 'lucide-react'
+import { Users, ArrowRight, Sparkles, History, BarChart3 } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { CardSkeleton } from '@/components/fortune/card-skeleton'
 import { FortuneCardDaily } from '@/components/fortune/fortune-card-daily'
@@ -71,6 +71,21 @@ export default async function HomePage() {
           <span className="flex-1 flex flex-col gap-0.5">
             <span className="text-base font-bold text-fortune-ink-deep">지난 운세 기록</span>
             <span className="text-sm font-bold text-fortune-charcoal">최근 30일 모아보기</span>
+          </span>
+          <ArrowRight className="size-5 text-fortune-charcoal" />
+        </Link>
+
+        <Link
+          href="/insights"
+          className="rounded-[32px] border p-6 flex items-center gap-4"
+          style={{ backgroundColor: '#EDE7F8', borderColor: '#D2C3EE' }}
+        >
+          <span className="size-12 rounded-full bg-fortune-canvas inline-flex items-center justify-center shrink-0">
+            <BarChart3 className="size-5 text-[#5C3FB8]" />
+          </span>
+          <span className="flex-1 flex flex-col gap-0.5">
+            <span className="text-base font-bold text-fortune-ink-deep">내 운세 인사이트</span>
+            <span className="text-sm font-bold text-fortune-charcoal">키워드 TOP · 요일별 빈도</span>
           </span>
           <ArrowRight className="size-5 text-fortune-charcoal" />
         </Link>
