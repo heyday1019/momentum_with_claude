@@ -1,4 +1,6 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
+import { Users, ArrowRight } from 'lucide-react'
 import { AppHeader } from '@/components/fortune/app-header'
 import { CardSkeleton } from '@/components/fortune/card-skeleton'
 import { FortuneCardDaily } from '@/components/fortune/fortune-card-daily'
@@ -27,6 +29,20 @@ export default async function HomePage() {
         <Suspense fallback={<CardSkeleton />}><DailyCard /></Suspense>
         <Suspense fallback={<CardSkeleton />}><ZodiacCard /></Suspense>
         <Suspense fallback={<CardSkeleton />}><LottoCard /></Suspense>
+
+        <Link
+          href="/lookup"
+          className="rounded-[32px] border border-fortune-hairline-soft bg-fortune-surface-soft p-6 flex items-center gap-4 mt-2"
+        >
+          <span className="size-12 rounded-full bg-fortune-canvas inline-flex items-center justify-center shrink-0">
+            <Users className="size-5 text-fortune-primary-deep" />
+          </span>
+          <span className="flex-1 flex flex-col gap-0.5">
+            <span className="text-base font-bold text-fortune-ink-deep">친구·가족 운세 보기</span>
+            <span className="text-sm text-fortune-steel">이름과 생일만 알면 OK</span>
+          </span>
+          <ArrowRight className="size-5 text-fortune-steel" />
+        </Link>
       </section>
     </main>
   )
