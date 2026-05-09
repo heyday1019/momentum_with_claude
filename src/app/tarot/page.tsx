@@ -1,6 +1,6 @@
 import { AppHeader } from '@/components/fortune/app-header'
 import { BackButton } from '@/components/fortune/back-button'
-import { TarotSpreadPicker } from '@/components/fortune/tarot-spread-picker'
+import { TarotDeckStage } from '@/components/fortune/tarot-deck-stage'
 
 export default function TarotEntryPage() {
   return (
@@ -14,45 +14,12 @@ export default function TarotEntryPage() {
           </h1>
           <p className="text-base font-bold text-fortune-ink leading-relaxed">
             마음 속에 질문 하나를 그려보고,<br />
-            카드 3장을 뽑아보세요.
+            카드를 뽑아보세요.
           </p>
         </div>
 
-        <div
-          className="rounded-[32px] aspect-[3/4] flex flex-col items-center justify-center gap-3 p-6"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, #2D3035 0%, #14161A 100%)',
-          }}
-        >
-          <CardBackTriple />
-        </div>
-
-        <TarotSpreadPicker />
-
-        <p className="text-xs text-fortune-stone leading-relaxed text-center">
-          78장 풀덱에서 무작위로 뽑아요. 결과는 저장되지 않아요.
-        </p>
+        <TarotDeckStage />
       </section>
     </main>
-  )
-}
-
-function CardBackTriple() {
-  return (
-    <div className="flex gap-3">
-      {[0, 1, 2].map(i => (
-        <div
-          key={i}
-          className="aspect-[5/9] w-16 rounded-xl border border-white/10 flex items-center justify-center"
-          style={{
-            background:
-              'repeating-linear-gradient(45deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 2px, transparent 2px, transparent 6px)',
-          }}
-        >
-          <span className="text-white/30 text-2xl font-light">★</span>
-        </div>
-      ))}
-    </div>
   )
 }

@@ -168,6 +168,22 @@ export const DECK_BY_ID: Record<number, TarotCard> = Object.fromEntries(
   FULL_DECK.map(c => [c.id, c])
 )
 
+const pad2 = (n: number) => String(n).padStart(2, '0')
+
+/**
+ * 카드의 이미지 경로. `public/tarot/<slug>.jpg`에 동일한 슬러그로 저장한다.
+ *  - major: `major-00` … `major-21`
+ *  - minor: `<suit>-01` … `<suit>-14` (rank=1=Ace, 14=King)
+ */
+export function tarotImageSlug(card: TarotCard): string {
+  if (card.suit === 'major') return `major-${pad2(card.id)}`
+  return `${card.suit}-${pad2(card.rank)}`
+}
+
+export function tarotImageSrc(card: TarotCard): string {
+  return `/tarot/${tarotImageSlug(card)}.jpg`
+}
+
 /** 기존 호환 alias — 메이저 아르카나만 추출 */
 export const MAJOR_ARCANA = MAJOR as readonly TarotCard[]
 export const MAJOR_ARCANA_BY_ID: Record<number, TarotCard> = Object.fromEntries(
