@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { readTheme } from "@/lib/fortune/theme";
 
 export const metadata: Metadata = {
   title: "운세 — 오늘의 나, 가볍게",
@@ -12,18 +13,23 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#1A1B3D",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-};
+export async function generateViewport(): Promise<Viewport> {
+  const theme = await readTheme();
+  return {
+    themeColor: theme === "dark" ? "#0F1216" : "#FFFFFF",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const theme = await readTheme();
+  const htmlClass = `h-full antialiased${theme === "dark" ? " dark" : ""}`;
   return (
-    <html lang="ko" className="h-full antialiased">
+    <html lang="ko" className={htmlClass}>
       <head>
         <link
           rel="stylesheet"
