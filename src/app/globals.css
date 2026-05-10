@@ -144,6 +144,21 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* fortune-* 다크 매핑 (DESIGN.md Known Gaps 채움 — MVP 범위) */
+  --color-fortune-canvas: #0F1216;
+  --color-fortune-surface-soft: #1A1E23;
+  --color-fortune-ink-deep: #F5F6F7;
+  --color-fortune-ink: #DDE1E4;
+  --color-fortune-charcoal: #B5BCC2;
+  --color-fortune-slate: #8A9299;
+  --color-fortune-steel: #6F7780;
+  --color-fortune-stone: #555C63;
+  --color-fortune-hairline: #2A2F35;
+  --color-fortune-hairline-soft: #1F242A;
+  --color-fortune-primary-soft: #0F2640;
+  /* primary, primary-deep, fb-blue, ink-button, warning, attention,
+     success, critical, critical-strong, kakao, kakao-ink — 라이트 hex 그대로 유지 */
 }
 
 @layer base {

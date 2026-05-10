@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ChevronLeft, Shield } from 'lucide-react'
 import { ProfileForm } from '@/components/fortune/profile-form'
 import { AccountActions } from '@/components/fortune/account-actions'
-import { getMyProfile, signOut } from '@/app/actions/profile'
+import { getMyProfile } from '@/app/actions/profile'
 import { checkIsAdmin } from '@/app/actions/admin'
 
 export default async function MePage() {
@@ -43,20 +43,6 @@ export default async function MePage() {
         )}
 
         <AccountActions />
-
-        <hr className="border-fortune-hairline-soft" />
-
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="w-full h-[50px] rounded-full border-2 border-fortune-hairline bg-fortune-canvas text-sm font-bold text-fortune-critical"
-          >
-            로그아웃
-          </button>
-        </form>
-        <p className="text-xs text-fortune-stone text-center">
-          v0.1.0 · 도움이 필요하면 <a href="mailto:help@momentum.app" className="underline">help@momentum.app</a>
-        </p>
       </section>
     </main>
   )

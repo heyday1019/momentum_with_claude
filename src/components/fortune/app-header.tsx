@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { User } from 'lucide-react'
+import { Settings, User } from 'lucide-react'
 
 export function AppHeader() {
   return (
@@ -7,9 +7,22 @@ export function AppHeader() {
       <Link href="/" aria-label="홈" className="text-lg font-bold tracking-tight text-fortune-ink-deep">
         운세
       </Link>
-      <Link href="/me" className="size-11 rounded-full inline-flex items-center justify-center" aria-label="내 정보">
-        <User className="size-5.5 text-fortune-ink-deep" />
-      </Link>
+      <div className="flex items-center">
+        <Link
+          href="/settings"
+          aria-label="설정"
+          className="size-11 rounded-full inline-flex items-center justify-center"
+        >
+          <Settings className="size-5.5 text-fortune-ink-deep" />
+        </Link>
+        <Link
+          href="/me"
+          aria-label="내 정보"
+          className="size-11 rounded-full inline-flex items-center justify-center"
+        >
+          <User className="size-5.5 text-fortune-ink-deep" />
+        </Link>
+      </div>
     </header>
   )
 }
