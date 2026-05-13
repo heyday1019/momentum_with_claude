@@ -1,7 +1,13 @@
 import Link from 'next/link'
 import { KakaoButton, GoogleButton } from '@/components/fortune/auth-button'
 
-export default function LoginPage() {
+interface PageProps {
+  searchParams: Promise<{ error?: string }>
+}
+
+export default async function LoginPage({ searchParams }: PageProps) {
+  const { error } = await searchParams
+
   return (
     <main className="flex min-h-screen flex-col">
       <div className="relative h-[60vh] flex items-end p-6 pb-10 rounded-b-[32px] overflow-hidden bg-gradient-to-b from-fortune-charcoal to-fortune-ink-deep">
@@ -16,6 +22,11 @@ export default function LoginPage() {
       </div>
 
       <div className="flex flex-col gap-3 p-6 pt-8">
+        {error && (
+          <div className="rounded-xl border border-fortune-critical/40 bg-fortune-critical/10 px-4 py-3 text-sm text-fortune-critical-strong">
+            로그인에 실패했어요: {error}
+          </div>
+        )}
         <KakaoButton />
         <GoogleButton />
         <div className="flex items-center gap-3 py-2">
