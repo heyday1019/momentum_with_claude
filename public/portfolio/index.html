@@ -366,11 +366,11 @@
     .closing-card .label { font-size: 12px; color: var(--steel); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
     .closing-card .value { font-size: 18px; color: var(--ink-deep); font-weight: 700; margin-top: 4px; }
 
-    /* Share button fixed bottom-right */
+    /* Share button fixed top-right — reveal.js 화살표 컨트롤과 겹침 회피 */
     .share-fab {
       position: fixed;
-      right: 24px;
-      bottom: 24px;
+      right: 16px;
+      top: 16px;
       z-index: 1000;
       display: flex;
       gap: 8px;
@@ -395,6 +395,81 @@
       z-index: 1001;
     }
     .toast.show { opacity: 1; }
+
+    /* ─── Mobile responsive (≤ 768px) ─────────────────────────────
+       reveal.js width=480 (모바일 init)로 슬라이드 캔버스가 좁아지므로
+       그리드는 1열로 스택, 폰트는 480px 캔버스에 맞게 재조정 */
+    @media (max-width: 768px) {
+      .reveal .slides section { padding: 18px 20px; }
+
+      .reveal h1 { font-size: 42px; line-height: 1.1; }
+      .reveal h2 { font-size: 28px; margin-bottom: 16px; line-height: 1.15; }
+      .reveal h3 { font-size: 20px; margin-bottom: 10px; }
+      .reveal p, .reveal li { font-size: 16px; line-height: 1.5; }
+
+      .grid-2, .grid-3, .grid-4, .split,
+      .closing-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+      }
+      .surface-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .aux-grid     { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .personas     { grid-template-columns: 1fr; gap: 10px; }
+
+      .hero .eyebrow  { font-size: 12px; }
+      .hero .subtitle { font-size: 18px; max-width: 100%; }
+      .hero .meta     { font-size: 12px; }
+      .eyebrow-tag    { font-size: 11px; }
+
+      .chip       { font-size: 12px; padding: 4px 10px; margin: 0 3px 3px 0; }
+      .btn        { font-size: 13px; padding: 10px 18px; }
+      .btn-ghost  { padding: 8px 16px; }
+
+      .surface { min-height: 90px; padding: 12px; border-radius: 16px; }
+      .surface .icon  { font-size: 22px; }
+      .surface .title { font-size: 14px; }
+      .surface .sub   { font-size: 11px; }
+
+      .aux        { font-size: 12px; padding: 10px 12px; border-radius: 12px; }
+      .aux strong { font-size: 13px; }
+
+      .persona      { padding: 14px; border-radius: 16px; }
+      .persona img  { width: 56px; height: 56px; margin-bottom: 6px; }
+      .persona .name    { font-size: 16px; }
+      .persona .model   { font-size: 11px; word-break: break-all; }
+      .persona .tagline { font-size: 13px; }
+
+      .arch-box { padding: 14px; }
+      .arch-row { flex-direction: column; gap: 8px; margin-bottom: 8px; }
+      .arch-arrow { font-size: 16px; transform: rotate(90deg); }
+      .arch-node  { font-size: 13px; padding: 10px 12px; }
+      .arch-caption { font-size: 11px; }
+
+      .skill-row { grid-template-columns: 1fr; gap: 6px; padding: 12px 0; }
+      .skill-name     { font-size: 14px; }
+      .skill-desc     { font-size: 14px; }
+      .skill-evidence { font-size: 11px; word-break: break-all; }
+
+      ul.tight li { font-size: 14px; padding: 6px 0; }
+
+      .trick      { padding: 12px 14px; border-radius: 12px; }
+      .trick .head { font-size: 14px; }
+      .trick .body { font-size: 12px; }
+      .trick code  { font-size: 11px; padding: 1px 4px; }
+
+      .reveal pre  { font-size: 11px; padding: 10px 12px; border-radius: 8px; }
+
+      .closing-card .label { font-size: 11px; }
+      .closing-card .value { font-size: 14px; }
+
+      .label-bad, .label-good { font-size: 11px; padding: 2px 8px; }
+
+      .share-fab { right: 10px; top: 10px; gap: 6px; }
+      .share-fab .btn { font-size: 12px; padding: 8px 12px; }
+
+      .cta-row { gap: 8px; }
+      .toast { font-size: 12px; bottom: 60px; padding: 8px 14px; }
+    }
   </style>
 </head>
 <body>
@@ -996,11 +1071,11 @@ export async function setTheme(theme: Theme) {
           </div>
           <div class="closing-card">
             <div class="label">Repo</div>
-            <div class="value">github.com/&lt;your-handle&gt;/momentum</div>
+            <div class="value">https://github.com/heyday1019/momentum_with_claude</div>
           </div>
           <div class="closing-card">
             <div class="label">Live</div>
-            <div class="value">momentum.&lt;your-domain&gt;</div>
+            <div class="value">https://momentum-with-claude.vercel.app</div>
           </div>
         </div>
         <div class="cta-row" style="margin-top: 32px;">
@@ -1030,25 +1105,30 @@ export async function setTheme(theme: Theme) {
     // ─────────────────────────────────────────────────────────────
     // 설정: 배포 전에 아래 두 줄을 교체하세요
     // ─────────────────────────────────────────────────────────────
-    const KAKAO_APP_KEY = 'YOUR_KAKAO_JAVASCRIPT_KEY'; // developers.kakao.com에서 발급
-    const SITE_URL      = window.location.href;        // 자동 (배포 후 절대 URL 권장)
+    const KAKAO_APP_KEY = 'c137773918bd58b18ff4de135fad565b';
+    const SITE_URL      = 'https://momentum-with-claude.vercel.app/portfolio';
     // ─────────────────────────────────────────────────────────────
 
-    // reveal init
+    // reveal init — 모바일 감지 시 캔버스 축소 (1280×800 → 480×800)
+    // viewport 대비 scale factor가 0.29 → 0.78로 올라가서 텍스트가 실제로 읽힐 만큼 커짐.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
     Reveal.initialize({
       hash: true,
-      slideNumber: 'c/t',
+      slideNumber: isMobile ? false : 'c/t',
       transition: 'slide',
       controls: true,
+      controlsLayout: 'edges',
       progress: true,
       center: false,
-      width: 1280,
-      height: 800,
-      margin: 0.04,
+      width: isMobile ? 480 : 1280,
+      height: isMobile ? 800 : 800,
+      margin: isMobile ? 0.02 : 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
     });
 
     // Kakao init
-    if (window.Kakao && KAKAO_APP_KEY && KAKAO_APP_KEY !== 'YOUR_KAKAO_JAVASCRIPT_KEY') {
+    if (window.Kakao && KAKAO_APP_KEY) {
       try { Kakao.init(KAKAO_APP_KEY); } catch (e) { /* already init */ }
     }
 
