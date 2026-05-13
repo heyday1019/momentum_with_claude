@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Momentum — AI 운세 앱 포트폴리오</title>
+
+  <!--
+    ─────────────────────────────────────────────────────────────────────────
+    KakaoTalk 공유 설정 가이드
+    ─────────────────────────────────────────────────────────────────────────
+    1) https://developers.kakao.com 에서 앱 등록
+    2) 플랫폼 > Web > 사이트 도메인에 배포 도메인 추가 (예: https://momentum.example.com)
+    3) JavaScript 키 복사 → 아래 KAKAO_APP_KEY 상수 교체
+    4) OG 미리보기를 위해 SITE_URL을 실제 배포 URL로 교체
+    배포 전에는 file:// 로 열어도 슬라이드는 동작합니다. (Kakao 공유는 https 필요)
+    ─────────────────────────────────────────────────────────────────────────
+  -->
+
+  <!-- Open Graph (KakaoTalk · Facebook · 일반 메신저 미리보기) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Momentum — AI 운세 앱 포트폴리오" />
+  <meta property="og:description" content="Next.js 16 + Supabase + OpenRouter로 만든 한국형 멀티-페르소나 AI 운세 서비스. 운세 · 타로 · 꿈해몽 · 다크모드 · PWA." />
+  <meta property="og:image" content="/icon-512.png" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Pretendard (DESIGN.md 한글 매핑) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+  <!-- reveal.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+
+  <style>
+    :root {
+      --canvas: #FFFFFF;
+      --ink-deep: #0A1317;
+      --ink: #1F2C32;
+      --charcoal: #3F4B52;
+      --slate: #5C6770;
+      --steel: #7A858C;
+      --stone: #A4ABAF;
+      --hairline: #CBD0D2;
+      --hairline-soft: #E5E8E9;
+      --surface-soft: #F5F6F7;
+      --primary: #0064E0;
+      --primary-deep: #0143B5;
+      --primary-soft: #E6F0FA;
+      --warning: #FFD24A;
+      --success: #1F9E5C;
+      --attention: #FF8400;
+      --critical: #E5453B;
+      --kakao: #FEE500;
+      --kakao-ink: #3C1E1E;
+      --font: "Pretendard Variable", Pretendard, Inter, "Helvetica Neue", "Apple SD Gothic Neo", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+    }
+
+    .reveal {
+      font-family: var(--font);
+      font-size: 28px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .reveal .slides {
+      text-align: left;
+    }
+    .reveal .slides section {
+      padding: 32px 56px;
+    }
+
+    /* Typography hierarchy from DESIGN.md */
+    .reveal h1 {
+      font-size: 64px;
+      font-weight: 500;
+      color: var(--ink-deep);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      text-transform: none;
+    }
+    .reveal h2 {
+      font-size: 44px;
+      font-weight: 500;
+      color: var(--ink-deep);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin: 0 0 32px;
+      text-transform: none;
+    }
+    .reveal h3 {
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--ink-deep);
+      letter-spacing: -0.01em;
+      margin: 0 0 16px;
+      text-transform: none;
+    }
+    .reveal p, .reveal li {
+      font-size: 22px;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+    .reveal strong { color: var(--ink-deep); font-weight: 700; }
+    .reveal em { font-style: normal; color: var(--primary); font-weight: 600; }
+
+    /* Pill chips */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      border: 1px solid var(--hairline-soft);
+      margin: 0 4px 4px 0;
+    }
+    .chip.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .chip.dark    { background: var(--ink-deep); color: #fff; border-color: var(--ink-deep); }
+    .chip.warn    { background: var(--warning); color: var(--ink-deep); border-color: var(--warning); }
+    .chip.kakao   { background: var(--kakao); color: var(--kakao-ink); border-color: var(--kakao); }
+
+    /* Cards */
+    .card {
+      background: var(--canvas);
+      border: 1px solid var(--hairline-soft);
+      border-radius: 16px;
+      padding: 20px 22px;
+    }
+    .card-photo {
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline-soft);
+      border-radius: 24px;
+      padding: 22px;
+    }
+
+    /* Grid layouts */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .split  { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; align-items: start; }
+
+    /* Code blocks */
+    .reveal pre {
+      box-shadow: none;
+      background: var(--ink-deep);
+      color: #E5E8E9;
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      line-height: 1.55;
+      width: 100%;
+      overflow: auto;
+    }
+    .reveal pre code {
+      padding: 0;
+      max-height: none;
+      font-family: var(--font-mono);
+    }
+    .label-bad, .label-good {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .label-bad  { background: var(--critical); color: #fff; }
+    .label-good { background: var(--success); color: #fff; }
+
+    /* Title slide hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100%;
+      gap: 18px;
+    }
+    .hero .eyebrow {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+    .hero .subtitle {
+      font-size: 24px;
+      color: var(--slate);
+      max-width: 760px;
+      line-height: 1.4;
+    }
+    .hero .meta {
+      font-size: 14px;
+      color: var(--steel);
+    }
+    .cta-row { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      border: 0;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .btn-primary { background: var(--ink-deep); color: #fff; }
+    .btn-buy     { background: var(--primary); color: #fff; }
+    .btn-kakao   { background: var(--kakao); color: var(--kakao-ink); }
+    .btn-ghost   {
+      background: transparent;
+      color: var(--ink-deep);
+      border: 2px solid var(--ink-deep);
+      padding: 10px 20px;
+    }
+
+    /* Feature map (slide 3) */
+    .surface-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+    .surface {
+      border-radius: 24px;
+      padding: 18px;
+      color: #fff;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .surface .icon { font-size: 28px; }
+    .surface .title { font-size: 18px; font-weight: 700; }
+    .surface .sub { font-size: 13px; opacity: 0.9; }
+    .surface.daily   { background: linear-gradient(135deg, #0064E0, #0143B5); }
+    .surface.zodiac  { background: linear-gradient(135deg, #FF8400, #E5453B); }
+    .surface.lotto   { background: linear-gradient(135deg, #1F9E5C, #0a7842); }
+    .surface.tarot   { background: linear-gradient(135deg, #3C1E1E, #1f0f0f); }
+    .surface.dream   { background: linear-gradient(135deg, #6A4FBB, #3c2782); }
+
+    .aux-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .aux {
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline-soft);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+    .aux strong { display: block; font-size: 15px; margin-bottom: 2px; }
+
+    /* Persona row */
+    .personas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .persona {
+      background: var(--surface-soft);
+      border-radius: 24px;
+      padding: 18px;
+      text-align: center;
+      border: 1px solid var(--hairline-soft);
+    }
+    .persona img {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+      margin: 0 auto 10px;
+      display: block;
+    }
+    .persona .name { font-weight: 700; font-size: 18px; color: var(--ink-deep); }
+    .persona .model { font-size: 12px; color: var(--steel); font-family: var(--font-mono); }
+    .persona .tagline { font-size: 14px; color: var(--charcoal); margin-top: 6px; }
+
+    /* ASCII / SVG architecture container */
+    .arch-box {
+      background: var(--surface-soft);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid var(--hairline-soft);
+    }
+    .arch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .arch-node {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-deep);
+    }
+    .arch-node.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .arch-node.dark    { background: var(--ink-deep); color: #fff; border-color: var(--ink-deep); }
+    .arch-arrow { color: var(--steel); font-size: 20px; }
+    .arch-caption { font-size: 14px; color: var(--steel); font-family: var(--font-mono); }
+
+    /* Skill list */
+    .skill-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--hairline-soft);
+    }
+    .skill-row:last-child { border-bottom: 0; }
+    .skill-name { font-family: var(--font-mono); font-size: 15px; color: var(--primary-deep); font-weight: 700; }
+    .skill-desc { font-size: 16px; color: var(--ink); }
+    .skill-evidence { font-size: 13px; color: var(--steel); font-family: var(--font-mono); margin-top: 4px; }
+
+    /* Footer slide number */
+    .reveal .progress { color: var(--primary); }
+
+    /* Section heading */
+    .eyebrow-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    /* Two-column bullet lists */
+    ul.tight { list-style: none; padding: 0; margin: 0; }
+    ul.tight li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--hairline-soft);
+      font-size: 18px;
+    }
+    ul.tight li:last-child { border-bottom: 0; }
+    ul.tight li strong { color: var(--ink-deep); }
+
+    /* Tricky decisions list */
+    .trick {
+      background: var(--surface-soft);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+    }
+    .trick .head { font-weight: 700; color: var(--ink-deep); font-size: 16px; margin-bottom: 4px; }
+    .trick .body { font-size: 14px; color: var(--charcoal); line-height: 1.5; }
+    .trick code  { background: #fff; padding: 1px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; }
+
+    /* Closing slide */
+    .closing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 720px; }
+    .closing-card {
+      background: var(--surface-soft);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--hairline-soft);
+    }
+    .closing-card .label { font-size: 12px; color: var(--steel); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .closing-card .value { font-size: 18px; color: var(--ink-deep); font-weight: 700; margin-top: 4px; }
+
+    /* Share button fixed bottom-right */
+    .share-fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 1000;
+      display: flex;
+      gap: 8px;
+    }
+    .share-fab .btn { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      background: var(--ink-deep);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 1001;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ─── 1. Title ─────────────────────────────────────────────── -->
+      <section>
+        <div class="hero">
+          <span class="eyebrow">Side project · 2026</span>
+          <h1>Momentum</h1>
+          <div class="subtitle">매일의 운세 · 타로 · 꿈해몽을 한국어로.<br/><em>멀티 페르소나 AI</em>로 라우팅하는 한국형 운세 서비스.</div>
+          <div>
+            <span class="chip dark">Next.js 16</span>
+            <span class="chip dark">React 19</span>
+            <span class="chip primary">Supabase</span>
+            <span class="chip primary">OpenRouter</span>
+            <span class="chip">Tailwind v4</span>
+          </div>
+          <div class="cta-row">
+            <button class="btn btn-kakao" onclick="shareKakao()">💬 카카오톡 공유</button>
+            <button class="btn btn-primary" onclick="shareNative()">📤 공유</button>
+            <button class="btn btn-ghost" onclick="copyLink()">🔗 링크 복사</button>
+          </div>
+          <div class="meta">Nick · heyday1019@gmail.com · 2026-05-13</div>
+        </div>
+      </section>
+
+      <!-- ─── 2. Problem & Why ─────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Why this exists</span>
+        <h2>운세 앱은 많다. 그런데…</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="color:var(--critical); font-weight: 700;">기존 앱의 빈틈</h3>
+            <ul class="tight">
+              <li>결과를 친구에게 <strong>공유</strong>하기 어려움 — 스크린샷이 전부</li>
+              <li>AI 답변이 <strong>한 가지 톤</strong>으로 고정 — 진지 / 가벼움 선택 불가</li>
+              <li>친구·가족 생일로 <strong>대신 봐주기</strong> 불가</li>
+              <li>다시 돌아올 이유가 없음 — 일회성 소비</li>
+            </ul>
+          </div>
+          <div class="card" style="border-color: var(--primary); background: var(--primary-soft);">
+            <h3 style="color: var(--primary-deep); font-weight: 700;">Momentum의 답</h3>
+            <ul class="tight">
+              <li><strong>1080×1080 OG 이미지</strong> — 모든 결과가 카드 한 장</li>
+              <li><strong>3개 AI 페르소나</strong> — GPT 도사 · Claude 점쟁이 · Gemini 선녀</li>
+              <li><strong>Viewer 모드</strong> — 이름·생일만 알면 익명 조회</li>
+              <li><strong>매일 새로운 운세 + 회고</strong> — 30일 history & insights</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 3. At a glance ──────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Feature map</span>
+        <h2>9개 화면, 5개 운세 surface</h2>
+        <div class="surface-grid">
+          <div class="surface daily">
+            <div class="icon">🌅</div>
+            <div>
+              <div class="title">Daily</div>
+              <div class="sub">오늘의 운세 · KST 캐싱</div>
+            </div>
+          </div>
+          <div class="surface zodiac">
+            <div class="icon">♋</div>
+            <div>
+              <div class="title">Zodiac</div>
+              <div class="sub">띠 · 별자리 운세</div>
+            </div>
+          </div>
+          <div class="surface lotto">
+            <div class="icon">🎰</div>
+            <div>
+              <div class="title">Lotto</div>
+              <div class="sub">행운의 번호 추천</div>
+            </div>
+          </div>
+          <div class="surface tarot">
+            <div class="icon">🃏</div>
+            <div>
+              <div class="title">Tarot</div>
+              <div class="sub">78장 풀덱 · 1·3장 스프레드</div>
+            </div>
+          </div>
+          <div class="surface dream">
+            <div class="icon">💭</div>
+            <div>
+              <div class="title">Dream</div>
+              <div class="sub">3 페르소나 꿈해몽</div>
+            </div>
+          </div>
+        </div>
+        <div class="aux-grid">
+          <div class="aux"><strong>/history</strong>최근 30일 회고</div>
+          <div class="aux"><strong>/insights</strong>본인 사용 패턴</div>
+          <div class="aux"><strong>/lookup</strong>친구·가족 viewer</div>
+          <div class="aux"><strong>/admin</strong>관리자 대시보드</div>
+        </div>
+      </section>
+
+      <!-- ─── 4. Tech stack ───────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Stack</span>
+        <h2>2026년의 최신 스택, 보수적이지 않게</h2>
+        <div class="grid-2">
+          <div>
+            <h3>Runtime &amp; Framework</h3>
+            <p>
+              <span class="chip dark">Next.js 16.2</span>
+              <span class="chip dark">React 19.2</span>
+              <span class="chip">App Router</span>
+              <span class="chip">Server Actions</span>
+              <span class="chip">Turbopack</span>
+              <span class="chip">PWA</span>
+            </p>
+            <h3 style="margin-top: 20px;">Backend &amp; AI</h3>
+            <p>
+              <span class="chip primary">Supabase Auth</span>
+              <span class="chip primary">Postgres + RLS</span>
+              <span class="chip primary">OpenRouter</span>
+              <span class="chip">Claude · GPT · Gemini</span>
+            </p>
+          </div>
+          <div>
+            <h3>UI &amp; Design</h3>
+            <p>
+              <span class="chip">Tailwind v4</span>
+              <span class="chip">shadcn/ui</span>
+              <span class="chip">Radix</span>
+              <span class="chip">Framer Motion</span>
+              <span class="chip">Pretendard</span>
+              <span class="chip">next/og · satori</span>
+            </p>
+            <h3 style="margin-top: 20px;">Tooling</h3>
+            <p>
+              <span class="chip warn">vitest</span>
+              <span class="chip warn">jsdom</span>
+              <span class="chip">TypeScript 5</span>
+              <span class="chip">ESLint 9</span>
+            </p>
+            <p style="margin-top: 18px; font-size: 14px; color: var(--steel);">
+              ※ Next 16의 file convention 변화 (<code style="font-family: var(--font-mono);">middleware.ts → proxy.ts</code>)에 맞춰 마이그레이션 완료.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 5. Architecture ─────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Architecture</span>
+        <h2>단방향 데이터 흐름 · 3단 라우팅</h2>
+        <div class="arch-box">
+          <div class="arch-row">
+            <div class="arch-node">📱 Client (RSC)</div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node dark">🛡 proxy.ts <br/><span style="font-weight:400; font-size:12px; opacity:0.7;">Supabase session refresh</span></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">⚡ Server Actions</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-node" style="visibility:hidden;">spacer</div>
+            <div class="arch-arrow" style="visibility:hidden;">→</div>
+            <div class="arch-node" style="visibility:hidden;">spacer</div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node" style="visibility:hidden;">spacer</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-node primary">🗄 Supabase<br/><span style="font-weight:400; font-size:12px; opacity:0.8;">RLS owner-only</span></div>
+            <div class="arch-arrow">+</div>
+            <div class="arch-node primary">🤖 OpenRouter<br/><span style="font-weight:400; font-size:12px; opacity:0.8;">Claude · GPT · Gemini</span></div>
+            <div class="arch-arrow">+</div>
+            <div class="arch-node primary">🖼 next/og<br/><span style="font-weight:400; font-size:12px; opacity:0.8;">1080×1080 share</span></div>
+          </div>
+          <p class="arch-caption" style="margin-top: 12px; text-align: center;">
+            모든 mutation은 Server Action → DB. AI 호출은 `onUsage` 콜백으로 토큰 로깅 (의존성 역전).
+          </p>
+        </div>
+      </section>
+
+      <!-- ─── 6. Auth flow ────────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Auth · Onboarding</span>
+        <h2>3채널 로그인 + onboarding 게이트</h2>
+        <div class="split">
+          <div>
+            <ul class="tight">
+              <li><strong>Kakao OAuth</strong> — 한국 메인 채널</li>
+              <li><strong>Google OAuth</strong> — 데스크톱·외국</li>
+              <li><strong>Email Magic Link</strong> — 비밀번호 없음</li>
+              <li>→ <code style="font-family: var(--font-mono);">/auth/callback</code>에서 PKCE code 교환</li>
+              <li>→ profile 없으면 <code style="font-family: var(--font-mono);">/onboarding</code>으로 강제 이동</li>
+              <li>→ proxy.ts가 매 요청마다 session refresh</li>
+            </ul>
+          </div>
+          <div>
+<pre><code>// src/proxy.ts (Next 16 convention)
+export async function proxy(req: NextRequest) {
+  const { supabase, response } = createMiddleware(req)
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const isProtected = PROTECTED_PATHS
+    .some(p => req.nextUrl.pathname.startsWith(p))
+
+  if (isProtected &amp;&amp; !user) {
+    return NextResponse.redirect(
+      new URL('/login', req.url)
+    )
+  }
+  return response
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 7. Fortune core ────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Fortune core</span>
+        <h2>KST day key 캐싱 + Suspense streaming</h2>
+        <div class="split">
+          <div>
+            <ul class="tight">
+              <li><strong>day_key</strong> = <code style="font-family: var(--font-mono);">YYYY-MM-DD</code> in KST — 자정 단위 캐시</li>
+              <li><strong>cache-or-generate</strong>: DB 조회 → 없으면 LLM 호출 → upsert</li>
+              <li>홈 화면은 <strong>3 카드 병렬 Suspense</strong> — 각각 독립 streaming</li>
+              <li>각 카드는 <strong>실패해도 isolation</strong> — silent catch + 빈 카드</li>
+              <li>띠·별자리는 <strong>생일에서 도출</strong> (pure function · unit tested)</li>
+            </ul>
+          </div>
+          <div>
+<pre><code>// 캐시 조회 — eq-chain quirk 회피
+const { data } = await supabase
+  .from('fortune_daily')
+  .select('content')
+  .match({
+    user_id, day_key, kind: 'daily'
+  })
+  .limit(1)
+
+if (data?.[0]) return data[0].content
+const content = await generate(prompt)
+await supabase.from('fortune_daily').insert(...)</code></pre>
+            <p style="font-size: 13px; color: var(--steel); margin-top: 6px;">
+              ※ <code>.eq().eq().maybeSingle()</code>이 0 rows 반환하는 버그 회피 — 자세한 건 slide 16.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 8. Tarot ───────────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Tarot</span>
+        <h2>78장 풀덱 + 플립 애니메이션</h2>
+        <div class="grid-2">
+          <div>
+            <h3>덱 구성</h3>
+            <ul class="tight">
+              <li><strong>Major Arcana</strong> 22장 (The Fool ~ The World)</li>
+              <li><strong>Minor Arcana</strong> 56장 — Wands · Cups · Swords · Pentacles</li>
+              <li>각 카드 <strong>정·역</strong> 의미 분리</li>
+              <li>이미지: <strong>Rider-Waite</strong> 퍼블릭 도메인</li>
+            </ul>
+            <h3 style="margin-top: 20px;">스프레드</h3>
+            <ul class="tight">
+              <li><strong>1장 데일리</strong> — 홈 카드와 연동 캐싱</li>
+              <li><strong>3장 스프레드</strong> — Past · Present · Future</li>
+            </ul>
+          </div>
+          <div>
+            <h3>인터랙션</h3>
+            <ul class="tight">
+              <li>덱에서 <strong>shuffle</strong> → 사용자가 카드 선택</li>
+              <li>선택 시 <strong>Framer Motion 플립</strong> (Y축 180°)</li>
+              <li>역방향 카드는 <strong>회전 적용</strong> + 해석 톤 변경</li>
+              <li>결과는 Server Action으로 영속화 (history 연동)</li>
+            </ul>
+            <p style="font-size: 14px; color: var(--steel); margin-top: 14px;">
+              ⚠️ next/og (satori) 한정 — <code>transform: rotate()</code>를 지원하지 않아 OG 이미지에서는 점선 테두리 + chip 라벨로 역방향 표현.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 9. Dream multi-persona ─────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Multi-persona AI</span>
+        <h2>한 화면, 3개 모델 — 선택은 사용자</h2>
+        <div class="personas">
+          <div class="persona">
+            <img src="/gpt-dog.png" alt="GPT 도사" onerror="this.style.display='none'"/>
+            <div class="name">GPT 도사</div>
+            <div class="model">openai/gpt-4o-mini</div>
+            <div class="tagline">깊이 있는 도가 통찰</div>
+          </div>
+          <div class="persona">
+            <img src="/claude-cat.png" alt="Claude 점쟁이" onerror="this.style.display='none'"/>
+            <div class="name">Claude 점쟁이</div>
+            <div class="model">anthropic/claude-haiku-4-5</div>
+            <div class="tagline">신비로운 직관 풀이</div>
+          </div>
+          <div class="persona">
+            <img src="/gemini-raccoon.png" alt="Gemini 선녀" onerror="this.style.display='none'"/>
+            <div class="name">Gemini 선녀</div>
+            <div class="model">google/gemini-2.5-flash</div>
+            <div class="tagline">따뜻한 선녀의 위로</div>
+          </div>
+        </div>
+        <ul class="tight" style="margin-top: 18px;">
+          <li><strong>단일 클라이언트</strong> — OpenRouter 게이트웨이 하나로 3개 프로바이더 라우팅</li>
+          <li><strong>페르소나별 system prompt</strong> — 같은 입력, 완전히 다른 톤</li>
+          <li><strong>자동 저널</strong> — 모든 해몽은 <code style="font-family: var(--font-mono);">/dream/journal</code>에 저장 (삭제 가능)</li>
+          <li><strong>토큰 로깅</strong> — 모든 호출이 <code style="font-family: var(--font-mono);">ai_call_log</code>에 기록 → admin 비용 추정</li>
+        </ul>
+      </section>
+
+      <!-- ─── 10. Sharing OG ─────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Shareability</span>
+        <h2>모든 결과를 <em>1080×1080 PNG</em> 한 장으로</h2>
+        <div class="grid-2">
+          <div>
+            <h3>4 surface × OG route</h3>
+            <ul class="tight">
+              <li><code style="font-family: var(--font-mono);">/api/og/daily</code> — 오늘의 운세</li>
+              <li><code style="font-family: var(--font-mono);">/api/og/zodiac</code> — 띠·별자리</li>
+              <li><code style="font-family: var(--font-mono);">/api/og/lotto</code> — 행운 번호</li>
+              <li><code style="font-family: var(--font-mono);">/api/og/tarot</code> — 타로 결과</li>
+              <li><code style="font-family: var(--font-mono);">/api/og/dream</code> — 꿈 해몽</li>
+            </ul>
+          </div>
+          <div>
+            <h3>3단 폴백</h3>
+            <ul class="tight">
+              <li>① <strong>모바일</strong>: Web Share API (시스템 share sheet)</li>
+              <li>② <strong>데스크톱</strong>: 클립보드에 PNG 복사</li>
+              <li>③ <strong>지원 안 됨</strong>: 이미지 새 탭으로 열고 사용자가 저장</li>
+              <li>UI: <code style="font-family: var(--font-mono);">ShareButton</code> 공통 컴포넌트로 4개 surface 재사용</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 11. Privacy & account ─────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Privacy first</span>
+        <h2>RLS owner-only · export · 완전 삭제</h2>
+        <div class="grid-2">
+          <div>
+            <h3>데이터 통제</h3>
+            <ul class="tight">
+              <li>모든 테이블 <strong>RLS owner-only</strong> — <code style="font-family: var(--font-mono);">user_id = auth.uid()</code></li>
+              <li>Cross-user 조회는 <strong>service_role 키</strong>로만 가능 (서버 전용)</li>
+              <li><code style="font-family: var(--font-mono);">/me</code> · <code style="font-family: var(--font-mono);">/settings</code>에서 즉시 export · delete</li>
+            </ul>
+          </div>
+          <div>
+            <h3>제공 액션</h3>
+            <ul class="tight">
+              <li><strong>JSON Export</strong> — 본인 모든 데이터 다운로드</li>
+              <li><strong>Full Delete</strong> — 프로필 + 운세 + 저널 + 로그 cascade</li>
+              <li><strong>Viewer mode</strong> (<code style="font-family: var(--font-mono);">/lookup</code>) — 친구 운세는 저장하지 않음</li>
+              <li><strong>Sign out</strong> — <code style="font-family: var(--font-mono);">/settings</code>에서 분리</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 12. Admin dashboard ────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Operations</span>
+        <h2>관리자 대시보드 — 비용을 보이게</h2>
+        <div class="grid-2">
+          <div>
+            <h3>접근 통제</h3>
+            <ul class="tight">
+              <li><code style="font-family: var(--font-mono);">ADMIN_EMAILS</code> 환경변수 화이트리스트</li>
+              <li>RLS bypass는 <strong>service_role 클라이언트</strong>만</li>
+              <li>일반 클라이언트와 모듈 분리 (<code style="font-family: var(--font-mono);">lib/supabase/admin.ts</code>)</li>
+            </ul>
+          </div>
+          <div>
+            <h3>지표</h3>
+            <ul class="tight">
+              <li><strong>Daily trend</strong> — 일자별 호출 수 차트</li>
+              <li><strong>Top users</strong> — 사용량 상위 N</li>
+              <li><strong>Persona breakdown</strong> — GPT vs Claude vs Gemini</li>
+              <li><strong>Cost estimation</strong> — 토큰 × 모델 단가</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 13. Design system ──────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Design system</span>
+        <h2>DESIGN.md 토큰을 Tailwind에 1:1 매핑</h2>
+        <div class="split">
+          <div>
+            <ul class="tight">
+              <li><strong>색</strong> — Meta commerce의 cobalt (<code style="font-family: var(--font-mono); color: var(--primary);">#0064E0</code>) + ink-deep + 카카오 yellow</li>
+              <li><strong>형태</strong> — pill button (<code style="font-family: var(--font-mono);">{rounded.full}</code>) + 32px 카드 (<code style="font-family: var(--font-mono);">{rounded.xxxl}</code>)</li>
+              <li><strong>폰트</strong> — Pretendard Variable (한국어 + 영문 동시)</li>
+              <li><strong>버튼 변형</strong> — <code style="font-family: var(--font-mono);">buyCta · kakao · google · ghostInk · pill</code></li>
+              <li><strong>다크 매핑</strong> — DESIGN.md "Known Gaps" 항목 직접 채움</li>
+            </ul>
+          </div>
+          <div>
+<pre><code>/* globals.css — fortune-* 토큰 */
+--color-fortune-primary:      #0064E0;
+--color-fortune-primary-deep: #0143B5;
+--color-fortune-ink-deep:     #0A1317;
+--color-fortune-kakao:        #FEE500;
+--color-fortune-kakao-ink:    #3C1E1E;
+--radius-fortune-pill:        9999px;
+--radius-fortune-card:        32px;
+--font-fortune: "Pretendard Variable",
+                "Inter", sans-serif;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 14. Dark mode SSR ──────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Dark mode</span>
+        <h2>쿠키 기반 SSR — 페이지 깜빡임 0</h2>
+        <div class="split">
+          <div>
+            <ul class="tight">
+              <li><strong>cookie reader</strong> — 화이트리스트 fallback (light · dark · system)</li>
+              <li><strong>setTheme Server Action</strong> — cookie set + <code style="font-family: var(--font-mono);">revalidatePath('/')</code></li>
+              <li><strong>RootLayout</strong>에서 <code style="font-family: var(--font-mono);">&lt;html class={theme}&gt;</code> 적용 — JS 없이 첫 페인트부터 다크</li>
+              <li><strong>ThemeToggle</strong> — segmented pill + optimistic UI</li>
+              <li><strong>viewport meta</strong> — <code style="font-family: var(--font-mono);">theme-color</code>도 분기</li>
+            </ul>
+          </div>
+          <div>
+<pre><code>// 'use server'
+export async function setTheme(theme: Theme) {
+  const store = await cookies()
+  store.set('theme', theme, {
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 365,
+  })
+  revalidatePath('/', 'layout')
+}</code></pre>
+            <p style="font-size: 13px; color: var(--steel); margin-top: 6px;">
+              브레인스토밍 spec → 실행 계획 → 구현까지 superpowers 워크플로우로 (slide 17 참조).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 15. PWA ────────────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">PWA</span>
+        <h2>설치 가능한 앱으로</h2>
+        <div class="grid-2">
+          <div>
+            <h3>구성</h3>
+            <ul class="tight">
+              <li><code style="font-family: var(--font-mono);">app/manifest.ts</code> — Next 16 동적 manifest</li>
+              <li>icon 192 · 512 · apple-icon</li>
+              <li><code style="font-family: var(--font-mono);">theme_color</code> · <code style="font-family: var(--font-mono);">background_color</code> 다크 매핑</li>
+              <li><code style="font-family: var(--font-mono);">display: standalone</code> — 홈 화면 추가 시 풀스크린</li>
+            </ul>
+          </div>
+          <div>
+            <h3>왜</h3>
+            <ul class="tight">
+              <li>매일 돌아오는 루틴 앱 — 홈 화면 진입이 자연스러움</li>
+              <li>스토어 등록 없이 <strong>iOS · Android 모두</strong> 설치 가능</li>
+              <li>네이티브 share sheet도 PWA에서 그대로 작동</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 16. Tricky decisions ───────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Lessons learned</span>
+        <h2>비자명했던 결정들</h2>
+        <div class="trick">
+          <div class="head">🔧 Supabase eq-chain quirk</div>
+          <div class="body">
+            <span class="label-bad">BAD</span> <code>.select('content').eq().eq().eq().maybeSingle()</code> — single column projection + 다중 eq + maybeSingle 조합에서 row가 있어도 0 rows 반환하는 케이스 발견.
+            <span class="label-good">GOOD</span> <code>.match({...}).limit(1)</code> + <code>data[0]</code> 패턴으로 통일.
+          </div>
+        </div>
+        <div class="trick">
+          <div class="head">🤖 OpenRouter Claude의 ```json 펜스 응답</div>
+          <div class="body">
+            <span class="label-bad">BAD</span> <code>response_format: json_object</code>를 줘도 <code>anthropic/claude-haiku</code>는 ``` 코드펜스로 감싸 반환 → <code>JSON.parse</code> 실패.
+            <span class="label-good">GOOD</span> <code>parseJsonLoose</code> 헬퍼 — 펜스 strip 후 파싱, 모든 LLM 응답에 적용.
+          </div>
+        </div>
+        <div class="trick">
+          <div class="head">🔀 Next 16 file convention 변경</div>
+          <div class="body">
+            <span class="label-bad">BAD</span> <code>middleware.ts</code>는 Next 16에서 deprecated.
+            <span class="label-good">GOOD</span> <code>src/proxy.ts</code> + <code>export function proxy()</code>로 리네임. helper는 <code>middleware.ts</code> 이름 유지 (함수 vs 컨벤션 분리).
+          </div>
+        </div>
+        <div class="trick">
+          <div class="head">🖼 satori는 <code>transform</code>을 지원하지 않는다</div>
+          <div class="body">
+            <span class="label-bad">BAD</span> 역방향 타로 카드 OG 이미지에 <code>rotate(180deg)</code> 적용 → satori가 무시.
+            <span class="label-good">GOOD</span> 점선 테두리 + "역방향" chip 라벨로 시각적 구분.
+          </div>
+        </div>
+        <div class="trick">
+          <div class="head">🔌 AI 호출 ↔ DB 로깅의 의존성 역전</div>
+          <div class="body">
+            OpenRouter client가 Supabase에 직접 import하면 단위 테스트에서 mock 지옥.
+            <span class="label-good">GOOD</span> <code>onUsage</code> 콜백으로 의존성 역전 — client는 토큰 카운트만 알고, Supabase 저장은 caller가 결정.
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 17. Built with Claude — Skills used ───────────────── -->
+      <section>
+        <span class="eyebrow-tag">Built with Claude Code</span>
+        <h2>사용한 Skills &amp; Tools</h2>
+        <div class="skill-row">
+          <div class="skill-name">superpowers:<br/>brainstorming</div>
+          <div>
+            <div class="skill-desc">아이디어 → 디자인 스펙. 한 번에 하나씩 질문, 2~3 접근법 비교, 트레이드오프 명시.</div>
+            <div class="skill-evidence">📄 docs/superpowers/specs/2026-05-02-fortune-service-phase1-design.md<br/>📄 docs/superpowers/specs/2026-05-10-settings-screen-dark-mode-design.md</div>
+          </div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">superpowers:<br/>writing-plans</div>
+          <div>
+            <div class="skill-desc">스펙 → 단계별 구현 계획. 파일·테스트·검증 기준까지 사전 정의.</div>
+            <div class="skill-evidence">📄 docs/superpowers/plans/2026-05-03-fortune-service-phase1.md<br/>📄 docs/superpowers/plans/2026-05-10-settings-screen-dark-mode.md</div>
+          </div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">superpowers:<br/>test-driven-development</div>
+          <div>
+            <div class="skill-desc">계산 가능한 도메인 (KST 변환, zodiac 도출, lotto 생성, prompt 빌더, OpenRouter parser)은 vitest로 먼저.</div>
+            <div class="skill-evidence">✅ 27 tests passed across 6 files — kst · zodiac · lotto · prompts · openrouter · smoke</div>
+          </div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Supabase MCP<br/><code>apply_migration</code></div>
+          <div>
+            <div class="skill-desc">스키마 변경을 SQL 파일로 보존하면서 동시에 원격 DB에 반영. 4개 마이그레이션 시간순 추적.</div>
+            <div class="skill-evidence">🗄 supabase/migrations/20260503000001_init_phase1.sql … 20260504000003_ai_call_log.sql</div>
+          </div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-name">Claude Code<br/>auto memory</div>
+          <div>
+            <div class="skill-desc">반복 함정 — Supabase eq-chain quirk, OpenRouter JSON 펜스 — 를 메모리에 적재해 재발 차단.</div>
+            <div class="skill-evidence">🧠 ~/.claude/.../memory/ — feedback_supabase_query_chain.md · feedback_openrouter_json_fences.md</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 18. What's next ─────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Roadmap</span>
+        <h2>다음에 붙일 수 있는 것</h2>
+        <div class="grid-2">
+          <div>
+            <h3>가까운 미래</h3>
+            <ul class="tight">
+              <li><strong>Push notification</strong> — Web Push로 매일 아침 운세 알림</li>
+              <li><strong>Streak</strong> — 연속 접속 일 + 도장 UI</li>
+              <li><strong>OG 캐싱</strong> — Vercel Blob에 결과 PNG 저장</li>
+            </ul>
+          </div>
+          <div>
+            <h3>중기 확장</h3>
+            <ul class="tight">
+              <li><strong>별 충전</strong> — Stripe + 무료 호스트 + 유료 정밀 운세</li>
+              <li><strong>i18n</strong> — 영어 / 일본어 — 동일 페르소나 톤 유지</li>
+              <li><strong>Vercel AI Gateway</strong>로 OpenRouter 대체 검토 + 폴백 모델</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 19. Closing ─────────────────────────────────────────── -->
+      <section>
+        <span class="eyebrow-tag">Thanks</span>
+        <h2>고맙습니다 🙏</h2>
+        <div class="closing-grid">
+          <div class="closing-card">
+            <div class="label">Contact</div>
+            <div class="value">heyday1019@gmail.com</div>
+          </div>
+          <div class="closing-card">
+            <div class="label">Stack</div>
+            <div class="value">Next.js 16 · Supabase · OpenRouter</div>
+          </div>
+          <div class="closing-card">
+            <div class="label">Repo</div>
+            <div class="value">github.com/&lt;your-handle&gt;/momentum</div>
+          </div>
+          <div class="closing-card">
+            <div class="label">Live</div>
+            <div class="value">momentum.&lt;your-domain&gt;</div>
+          </div>
+        </div>
+        <div class="cta-row" style="margin-top: 32px;">
+          <button class="btn btn-kakao" onclick="shareKakao()">💬 카카오톡으로 이 포트폴리오 공유</button>
+          <button class="btn btn-ghost" onclick="copyLink()">🔗 링크 복사</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Floating share buttons -->
+  <div class="share-fab">
+    <button class="btn btn-kakao" onclick="shareKakao()" title="카카오톡 공유">💬</button>
+    <button class="btn btn-primary" onclick="copyLink()" title="링크 복사">🔗</button>
+  </div>
+
+  <div id="toast" class="toast">링크가 복사되었습니다</div>
+
+  <!-- reveal.js -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+
+  <!-- Kakao SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────
+    // 설정: 배포 전에 아래 두 줄을 교체하세요
+    // ─────────────────────────────────────────────────────────────
+    const KAKAO_APP_KEY = 'YOUR_KAKAO_JAVASCRIPT_KEY'; // developers.kakao.com에서 발급
+    const SITE_URL      = window.location.href;        // 자동 (배포 후 절대 URL 권장)
+    // ─────────────────────────────────────────────────────────────
+
+    // reveal init
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      controls: true,
+      progress: true,
+      center: false,
+      width: 1280,
+      height: 800,
+      margin: 0.04,
+    });
+
+    // Kakao init
+    if (window.Kakao && KAKAO_APP_KEY && KAKAO_APP_KEY !== 'YOUR_KAKAO_JAVASCRIPT_KEY') {
+      try { Kakao.init(KAKAO_APP_KEY); } catch (e) { /* already init */ }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function shareKakao() {
+      if (!window.Kakao || !Kakao.isInitialized || !Kakao.isInitialized()) {
+        showToast('Kakao 앱 키를 먼저 설정하세요');
+        return;
+      }
+      Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: 'Momentum — AI 운세 앱 포트폴리오',
+          description: 'Next.js 16 + Supabase + OpenRouter로 만든 한국형 멀티 페르소나 AI 운세 서비스',
+          imageUrl: new URL('/icon-512.png', SITE_URL).toString(),
+          link: { mobileWebUrl: SITE_URL, webUrl: SITE_URL },
+        },
+        buttons: [
+          { title: '슬라이드 보기', link: { mobileWebUrl: SITE_URL, webUrl: SITE_URL } },
+        ],
+      });
+    }
+
+    async function shareNative() {
+      const shareData = {
+        title: 'Momentum — AI 운세 앱 포트폴리오',
+        text: 'Next.js 16 + Supabase + OpenRouter로 만든 한국형 멀티 페르소나 AI 운세 서비스',
+        url: SITE_URL,
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch (e) { /* user cancelled */ }
+      } else {
+        copyLink();
+      }
+    }
+
+    async function copyLink() {
+      try {
+        await navigator.clipboard.writeText(SITE_URL);
+        showToast('링크가 복사되었습니다 ✓');
+      } catch (e) {
+        showToast('복사에 실패했습니다');
+      }
+    }
+
+    // expose to inline onclick
+    window.shareKakao = shareKakao;
+    window.shareNative = shareNative;
+    window.copyLink = copyLink;
+  </script>
+</body>
+</html>
