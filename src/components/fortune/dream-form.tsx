@@ -6,6 +6,7 @@ import { Loader2, Moon } from 'lucide-react'
 import { ShareButton } from './share-button'
 import { getDreamInterpretation, type DreamInterpretation } from '@/app/actions/dream'
 import { DREAM_PERSONAS, type DreamPersonaKey, type DreamPersonaMeta } from '@/lib/fortune/dream-personas'
+import { InsufficientCreditsDialog } from '@/components/billing/insufficient-credits-dialog'
 
 const MIN_LEN = 10
 const MAX_LEN = 1000
@@ -19,6 +20,7 @@ export function DreamForm() {
   const [content, setContent] = useState('')
   const [result, setResult] = useState<ResultState | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [needsCredits, setNeedsCredits] = useState(false)
   const [pendingPersona, setPendingPersona] = useState<DreamPersonaKey | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -30,7 +32,11 @@ export function DreamForm() {
     startTransition(async () => {
       const res = await getDreamInterpretation({ content: trimmed, persona })
       setPendingPersona(null)
-      if (!res.ok) { setError(res.error); return }
+      if (!res.ok) {
+        if (res.code === 'INSUFFICIENT_CREDITS') setNeedsCredits(true)
+        else setError(res.error)
+        return
+      }
       setResult({ persona: res.persona, data: res.data })
     })
   }
@@ -43,7 +49,12 @@ export function DreamForm() {
 
   if (result) {
     const meta = DREAM_PERSONAS.find(p => p.key === result.persona)!
-    return <DreamResult data={result.data} meta={meta} onReset={onReset} />
+    return (
+      <>
+        <DreamResult data={result.data} meta={meta} onReset={onReset} />
+        <InsufficientCreditsDialog open={needsCredits} onOpenChange={setNeedsCredits} />
+      </>
+    )
   }
 
   const formDisabled = isPending
@@ -93,6 +104,8 @@ export function DreamForm() {
       <p className="text-xs text-fortune-stone leading-relaxed text-center">
         결과는 자동으로 꿈 일기에 보관돼요. 필요 없으면 일기에서 삭제할 수 있어요.
       </p>
+
+      <InsufficientCreditsDialog open={needsCredits} onOpenChange={setNeedsCredits} />
     </div>
   )
 }

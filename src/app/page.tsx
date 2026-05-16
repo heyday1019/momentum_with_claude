@@ -8,6 +8,8 @@ import { FortuneCardZodiac } from '@/components/fortune/fortune-card-zodiac'
 import { FortuneCardLotto } from '@/components/fortune/fortune-card-lotto'
 import { getDailyFortune, getZodiacFortune, getLottoRec } from '@/app/actions/fortune'
 import { getMyProfile } from '@/app/actions/profile'
+import { isInsufficient } from '@/lib/billing/consume'
+import { NeedsCreditsCard } from '@/components/billing/needs-credits-card'
 
 export default async function HomePage() {
   const profile = await getMyProfile()
@@ -114,6 +116,7 @@ async function DailyCard() {
     const data = await getDailyFortune()
     return <FortuneCardDaily data={data} />
   } catch (e) {
+    if (isInsufficient(e)) return <NeedsCreditsCard label="오늘의 운세" />
     console.error('[DailyCard] failed:', e)
     return <ErrorCard label="오늘의 운세" />
   }
@@ -123,6 +126,7 @@ async function ZodiacCard() {
     const data = await getZodiacFortune()
     return <FortuneCardZodiac data={data} />
   } catch (e) {
+    if (isInsufficient(e)) return <NeedsCreditsCard label="띠 · 별자리" />
     console.error('[ZodiacCard] failed:', e)
     return <ErrorCard label="띠 · 별자리" />
   }
@@ -132,6 +136,7 @@ async function LottoCard() {
     const data = await getLottoRec()
     return <FortuneCardLotto data={data} />
   } catch (e) {
+    if (isInsufficient(e)) return <NeedsCreditsCard label="행운의 로또번호" />
     console.error('[LottoCard] failed:', e)
     return <ErrorCard label="행운의 로또번호" />
   }

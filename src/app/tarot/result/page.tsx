@@ -10,6 +10,8 @@ import {
   getTarotReading, getTarotOneCardReading,
   type TarotInterpretation, type TarotOneCardInterpretation,
 } from '@/app/actions/tarot'
+import { isInsufficient } from '@/lib/billing/consume'
+import { NeedsCreditsCard } from '@/components/billing/needs-credits-card'
 
 interface PageProps {
   searchParams: Promise<{ d?: string }>
@@ -71,6 +73,7 @@ async function ThreeCardReadingSection({ draws }: { draws: DrawnCard[] }) {
   try {
     reading = await getTarotReading(draws)
   } catch (e) {
+    if (isInsufficient(e)) return <NeedsCreditsCard label="타로 3장 해석" />
     console.error('[tarot/result/three] reading failed:', e)
     return <ReadingError />
   }
@@ -123,6 +126,7 @@ async function OneCardReadingSection({ draws }: { draws: DrawnCard[] }) {
   try {
     reading = await getTarotOneCardReading(draws)
   } catch (e) {
+    if (isInsufficient(e)) return <NeedsCreditsCard label="오늘의 타로" />
     console.error('[tarot/result/one] reading failed:', e)
     return <ReadingError />
   }
