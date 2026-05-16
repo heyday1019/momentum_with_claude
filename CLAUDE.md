@@ -5,6 +5,15 @@
 
 UI 디자인 작업 시 반드시 `DESIGN.md`를 먼저 참고한다. 컴포넌트 스타일, 레이아웃, 톤앤매너에 대한 결정은 `DESIGN.md`의 가이드를 따른다.
 
+## Git 커밋 & Push 규칙
+
+기능 개발이 완료될 때마다 다음 순서를 따른다.
+
+1. 변경 파일 / diff 요약을 사용자에게 제시하고 **명시적 승인**을 받는다. 승인 없이는 `git commit`, `git push` 어느 것도 실행하지 않는다.
+2. 승인 후 한 기능 = 한 커밋 단위로 `git commit` 작성. 메시지는 기존 컨벤션(`feat(scope): ...`, `fix(scope): ...` 등) 유지.
+3. 커밋 직후 현재 브랜치를 origin에 `git push` 한다. push 결과(PR URL 등)는 사용자에게 보고한다.
+4. force push, 브랜치 삭제, 훅 무시(`--no-verify`) 같은 파괴적 동작은 사용자가 명시적으로 요청한 경우에만 수행한다.
+
 ## Phase 1 환경 메모
 
 - 로컬 dev: `.env.local`에 Supabase + OpenRouter 키 입력 후 `npm run dev`
