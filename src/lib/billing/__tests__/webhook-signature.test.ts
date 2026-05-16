@@ -51,4 +51,11 @@ describe('verifyPolarSignature', () => {
   it('rejects non-numeric timestamp', () => {
     expect(verifyPolarSignature({ id, ts: 'abc', body, sig: sign(id, 'abc', body), secret: SECRET })).toBe(false)
   })
+
+  it('accepts a polar_whs_ prefixed secret', () => {
+    const polarSecret = `polar_whs_${SECRET_RAW.toString('base64')}`
+    const payload = `${id}.${now}.${body}`
+    const sig = `v1,${createHmac('sha256', SECRET_RAW).update(payload).digest('base64')}`
+    expect(verifyPolarSignature({ id, ts: now, body, sig, secret: polarSecret })).toBe(true)
+  })
 })

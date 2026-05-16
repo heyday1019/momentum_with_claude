@@ -18,9 +18,16 @@ export function verifyPolarSignature({ id, ts, body, sig, secret }: VerifyArgs):
   const now = Math.floor(Date.now() / 1000)
   if (Math.abs(now - tsNum) > MAX_SKEW_SECONDS) return false
 
-  const rawSecret = secret.startsWith('whsec_')
-    ? Buffer.from(secret.slice('whsec_'.length), 'base64')
-    : Buffer.from(secret, 'utf-8')
+  // Polar issues secrets with `polar_whs_` prefix; Standard Webhooks default is `whsec_`.
+  // Both encode the HMAC key as base64 after the prefix.
+  let rawSecret: Buffer
+  if (secret.startsWith('whsec_')) {
+    rawSecret = Buffer.from(secret.slice('whsec_'.length), 'base64')
+  } else if (secret.startsWith('polar_whs_')) {
+    rawSecret = Buffer.from(secret.slice('polar_whs_'.length), 'base64')
+  } else {
+    rawSecret = Buffer.from(secret, 'utf-8')
+  }
 
   const payload = `${id}.${ts}.${body}`
   const expected = createHmac('sha256', rawSecret).update(payload).digest('base64')
