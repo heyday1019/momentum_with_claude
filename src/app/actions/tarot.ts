@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
 import { logAiCall } from '@/lib/openrouter/log'
+import { consumeCredit } from '@/lib/billing/consume'
 import { todayKst } from '@/lib/fortune/kst'
 import { SYSTEM_PROMPT, buildTarotPrompt, buildTarotOneCardPrompt, type TarotPromptCard } from '@/lib/fortune/prompts'
 import { POSITION_LABELS, SPREAD_POSITIONS, type DrawnCard } from '@/lib/tarot/types'
@@ -33,6 +34,8 @@ export async function getTarotReading(draws: DrawnCard[]): Promise<TarotInterpre
     orientation: d.orientation === 'upright' ? '정방향' : '역방향',
     baseMeaning: d.orientation === 'upright' ? d.card.upright : d.card.reversed,
   }))
+
+  await consumeCredit({ supabase, userId: user.id, reason: 'consume_tarot', relatedKind: 'tarot_three' })
 
   const result = await callFortuneModel<TarotInterpretation>({
     systemPrompt: SYSTEM_PROMPT,
@@ -78,6 +81,8 @@ export async function getTarotOneCardReading(draws: DrawnCard[]): Promise<TarotO
     orientation: drawn.orientation === 'upright' ? '정방향' : '역방향',
     baseMeaning: drawn.orientation === 'upright' ? drawn.card.upright : drawn.card.reversed,
   }
+
+  await consumeCredit({ supabase, userId: user.id, reason: 'consume_tarot', relatedKind: 'tarot_one' })
 
   const result = await callFortuneModel<TarotOneCardInterpretation>({
     systemPrompt: SYSTEM_PROMPT,
