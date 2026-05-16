@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
 import { logAiCall } from '@/lib/openrouter/log'
+import { consumeCredit, isInsufficient } from '@/lib/billing/consume'
 import { todayKst } from '@/lib/fortune/kst'
 import { DREAM_PERSONA_PROMPTS, buildDreamPrompt } from '@/lib/fortune/prompts'
 import { DREAM_PERSONAS, type DreamPersonaKey } from '@/lib/fortune/dream-personas'
@@ -23,7 +24,7 @@ export interface DreamInterpretation {
 
 export type DreamActionResult =
   | { ok: true; persona: DreamPersonaKey; data: DreamInterpretation }
-  | { ok: false; error: string }
+  | { ok: false; error: string; code?: 'INSUFFICIENT_CREDITS' }
 
 const MIN_LEN = 10
 const MAX_LEN = 1000
@@ -48,6 +49,13 @@ export async function getDreamInterpretation(input: {
   const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profileRow) return { ok: false, error: '프로필 정보를 찾을 수 없어요' }
   const profile = profileRow as { name: string; birthdate: string; gender: Gender }
+
+  try {
+    await consumeCredit({ supabase, userId: user.id, reason: 'consume_dream', relatedKind: input.persona })
+  } catch (e) {
+    if (isInsufficient(e)) return { ok: false, error: '크레딧이 부족해요', code: 'INSUFFICIENT_CREDITS' }
+    throw e
+  }
 
   // 사용 통계 — 응답 성공 여부와 무관하게 클릭 시점에 누적 (실패도 사용자 의도)
   // 동시에 진행 (insert는 fire-and-forget으로 두지 않고 결과 확인)
