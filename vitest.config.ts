@@ -11,6 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // server-only is a Next.js guard package that throws at build time
+      // when imported into a client bundle. In tests we run server code
+      // directly under Node, so map it to an empty module.
+      'server-only': path.resolve(__dirname, './src/test/server-only-stub.ts'),
     },
   },
 })
