@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { callFortuneModel } from '@/lib/openrouter/client'
 import { logAiCall } from '@/lib/openrouter/log'
+import { consumeCredit } from '@/lib/billing/consume'
 import { todayKst, nextLottoDrawNumber } from '@/lib/fortune/kst'
 import { zodiacAnimal, zodiacSign } from '@/lib/fortune/zodiac'
 import { generateLottoNumbers } from '@/lib/fortune/lotto'
@@ -43,6 +44,8 @@ export async function getDailyFortune(viewer?: ViewerProfile): Promise<DailyCont
       .limit(1)
     if (error) console.error('[fortune_daily/daily] select error:', error)
     if (data && data.length > 0) return data[0].content as unknown as DailyContent
+
+    await consumeCredit({ supabase, userId: user.id, reason: 'consume_daily', relatedKind: 'daily', relatedId: today })
   }
 
   const result = await callFortuneModel<DailyContent>({
@@ -80,6 +83,8 @@ export async function getZodiacFortune(viewer?: ViewerProfile): Promise<ZodiacCo
       .limit(1)
     if (error) console.error('[fortune_daily/zodiac] select error:', error)
     if (data && data.length > 0) return data[0].content as unknown as ZodiacContent
+
+    await consumeCredit({ supabase, userId: user.id, reason: 'consume_zodiac', relatedKind: 'zodiac', relatedId: today })
   }
 
   const animal = zodiacAnimal(target.birthdate)
@@ -133,6 +138,8 @@ export async function getLottoRec(viewer?: ViewerProfile): Promise<LottoResult> 
       numbers: data[0].numbers as number[],
       comment: data[0].comment,
     }
+
+    await consumeCredit({ supabase, userId: user.id, reason: 'consume_lotto', relatedKind: 'lotto', relatedId: String(drawNumber) })
   }
 
   // viewer 모드면 anonymous seed로
