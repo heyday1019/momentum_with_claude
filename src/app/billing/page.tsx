@@ -28,9 +28,9 @@ export default async function BillingPage() {
       </header>
 
       <section className="grid gap-6 md:grid-cols-3">
-        <CreditPackageCard sku="small"  price="$1.99" />
-        <CreditPackageCard sku="medium" price="$7.99" discountLabel="-20% off" featured />
-        <CreditPackageCard sku="large"  price="$24.99" discountLabel="-37% off" />
+        <CreditPackageCard sku="small"  price="₩1,900" />
+        <CreditPackageCard sku="medium" price="₩7,900" discountLabel="-17% off" featured />
+        <CreditPackageCard sku="large"  price="₩24,900" discountLabel="-35% off" />
       </section>
 
       <footer className="text-xs text-fortune-steel">
