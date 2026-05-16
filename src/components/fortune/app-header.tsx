@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Settings, User } from 'lucide-react'
+import { CreditBadge } from '@/components/billing/credit-badge'
 
 export function AppHeader() {
   return (
@@ -7,7 +8,8 @@ export function AppHeader() {
       <Link href="/" aria-label="홈" className="text-lg font-bold tracking-tight text-fortune-ink-deep">
         운세
       </Link>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <CreditBadge />
         <Link
           href="/settings"
           aria-label="설정"
