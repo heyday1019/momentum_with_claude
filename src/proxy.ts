@@ -1,7 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
-const PUBLIC_PATHS = ['/login', '/login/email', '/auth/callback']
+const PUBLIC_PATHS = [
+  '/login',
+  '/login/email',
+  '/auth/callback',
+  '/about',
+  '/terms',
+  '/privacy',
+]
 const ONBOARDING_PATH = '/onboarding'
 
 export async function proxy(request: NextRequest) {
