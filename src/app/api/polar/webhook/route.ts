@@ -28,7 +28,21 @@ export async function POST(req: Request) {
   const admin = createAdminClient()
 
   if (!verifyPolarSignature({ id, ts, body, sig, secret })) {
-    await logBilling({ supabase: admin, event: 'webhook_signature_invalid', payload: { id } })
+    // 진단 로그 — 어떤 secret 해석에서도 매칭되지 않을 때, 우리 측이 본 헤더 prefix 와
+    // 본문 길이만 기록해서 Polar 가 실제로 어떤 알고리즘으로 서명하는지 비교 가능하게 한다.
+    // secret 자체는 절대 기록하지 않는다.
+    await logBilling({
+      supabase: admin,
+      event: 'webhook_signature_invalid',
+      payload: {
+        id,
+        ts,
+        sig_prefix: sig.slice(0, 24),
+        sig_count: sig.split(' ').length,
+        body_bytes: body.length,
+        secret_prefix: secret.slice(0, 12) + '…',
+      },
+    })
     return new NextResponse('invalid signature', { status: 401 })
   }
 
