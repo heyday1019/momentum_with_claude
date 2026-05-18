@@ -13,6 +13,7 @@ const PUBLIC_PATHS = new Set<string>([
   '/tarot',
   '/dream',
   '/lotto',
+  '/opengraph-image',
 ])
 const ONBOARDING_PATH = '/onboarding'
 
