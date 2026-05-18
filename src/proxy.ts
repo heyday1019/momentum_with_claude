@@ -1,7 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
-const PUBLIC_PATHS = ['/login', '/login/email', '/auth/callback']
+// 정확 매칭 경로만 public — prefix 매칭은 /tarot/result, /dream/journal 같은 인증 자식까지 노출시키므로 사용하지 않음
+const PUBLIC_PATHS = new Set<string>([
+  '/login',
+  '/login/email',
+  '/auth/callback',
+  '/about',
+  '/terms',
+  '/privacy',
+  '/fortune',
+  '/tarot',
+  '/dream',
+  '/lotto',
+])
 const ONBOARDING_PATH = '/onboarding'
 
 export async function proxy(request: NextRequest) {
@@ -16,7 +28,7 @@ export async function proxy(request: NextRequest) {
     pathname.includes('.')
   ) return response
 
-  const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
+  const isPublic = PUBLIC_PATHS.has(pathname)
 
   // 1) 미인증 + 보호 경로 → /login
   if (!user && !isPublic) {
