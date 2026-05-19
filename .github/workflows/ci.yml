@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Lint (non-blocking)
+        # NOTE: 머지 게이트에서 제외. 기존 코드 7개 위반(react-hooks/error-boundaries, prefer-const)
+        # 정리 후 continue-on-error 제거 예정. follow-up: chore(lint) cleanup task 참조.
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          NEXT_PUBLIC_SITE_URL: https://placeholder.vercel.app
+          OPENROUTER_API_KEY: placeholder
+          USE_OPENROUTER_MOCK: 'true'
+          POLAR_ENV: sandbox
+          POLAR_ORG_TOKEN: placeholder
+          POLAR_WEBHOOK_SECRET: whsec_placeholder
+          POLAR_PRODUCT_SMALL: placeholder
+          POLAR_PRODUCT_MEDIUM: placeholder
+          POLAR_PRODUCT_LARGE: placeholder
+          ADMIN_EMAILS: placeholder@example.com
