@@ -1,0 +1,51 @@
+name: Production Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+concurrency:
+  group: smoke-prod
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for Vercel deploy
+        run: sleep 90
+
+      - name: 4 landings return 200
+        run: |
+          for p in /fortune /tarot /dream /lotto; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://momentum-with-claude.vercel.app$p")
+            if [ "$code" != "200" ]; then
+              echo "FAIL: $p returned $code (expected 200)"
+              exit 1
+            fi
+            echo "OK: $p $code"
+          done
+
+      - name: SEO assets return 200
+        run: |
+          for p in /robots.txt /sitemap.xml /llms.txt /opengraph-image; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://momentum-with-claude.vercel.app$p")
+            if [ "$code" != "200" ]; then
+              echo "FAIL: $p returned $code (expected 200)"
+              exit 1
+            fi
+            echo "OK: $p $code"
+          done
+
+      - name: Protected child routes redirect (307)
+        run: |
+          for p in /tarot/result /dream/journal /billing /history /me /settings; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://momentum-with-claude.vercel.app$p")
+            if [ "$code" != "307" ]; then
+              echo "FAIL: $p returned $code (expected 307)"
+              exit 1
+            fi
+            echo "OK: $p $code"
+          done
