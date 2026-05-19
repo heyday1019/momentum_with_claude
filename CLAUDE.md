@@ -5,6 +5,29 @@
 
 UI 디자인 작업 시 반드시 `DESIGN.md`를 먼저 참고한다. 컴포넌트 스타일, 레이아웃, 톤앤매너에 대한 결정은 `DESIGN.md`의 가이드를 따른다.
 
+## 브랜치 & 환경 워크플로우
+
+### 브랜치 구조
+- `master` — 운영 (Production). branch protection 활성. 직접 push 금지.
+- `develop` — 영속 스테이징. Vercel Custom Env `development`에 자동 배포.
+- `feature/<topic>` / `fix/<topic>` — 작업용 임시 브랜치. develop에 PR.
+
+### Golden Path
+1. `develop`에서 feature 브랜치 컷
+2. 작업 후 develop으로 PR → CI 통과 시 머지 → dev 환경 자동 배포
+3. development 환경에서 통합 테스트 (4개 랜딩 + 결제 sandbox + RLS)
+4. (마이그레이션 있으면) Supabase MCP로 dev에 apply
+5. develop → master PR → CI 통과 시 머지 → 운영 자동 배포
+6. (마이그레이션 있으면) master 머지 직후 운영 Supabase에 apply
+
+### 핫픽스 예외
+운영 다운 등 명확한 사유에만 master에서 직접 fix 브랜치 컷 → master PR. 머지 후 develop으로 백포트 PR.
+
+### 마이그레이션 원칙
+- forward-only. down 마이그레이션 작성 금지.
+- 항상 dev에 먼저 apply → 검증 → master 머지 후 prod apply.
+- Destructive change(컬럼/테이블 DROP, NOT NULL 추가)는 3-phase로 분리.
+
 ## Git 커밋 & Push 규칙
 
 기능 개발이 완료될 때마다 다음 순서를 따른다.
