@@ -60,6 +60,11 @@ function parseJsonLoose<T>(raw: string): T {
 
 /** 1회 재시도 포함 — JSON 파싱 실패 시 한 번만 더 호출 */
 export async function callFortuneModel<T>(opts: CallOptions): Promise<T> {
+  if (process.env.USE_OPENROUTER_MOCK === 'true') {
+    const mock = await import('./__mocks__/client')
+    return mock.callFortuneModel<T>({ userPrompt: opts.userPrompt })
+  }
+
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) throw new OpenRouterError('OPENROUTER_API_KEY missing', 500)
 
